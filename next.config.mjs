@@ -5,7 +5,11 @@ const nextConfig = {
   },
   images: {
     unoptimized: true,
+    domains: [
+      "cof0storage0dev.blob.core.windows.net",
+      "ezzy0commerce0prod.blob.core.windows.net",
+    ],
   },
-}
+};
 
-export default nextConfig
+export default nextConfig;

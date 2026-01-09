@@ -22,6 +22,8 @@ export interface Product {
   tags?: string[]
   metalValue?: number
   stoneValue?: number
+  variant?: string
+
 }
 
 export interface CustomProduct extends Product {
