@@ -1,9 +1,11 @@
 
 import { QueryClient } from '@tanstack/react-query';
+import { UserSignInDto } from './dto';
+import { SignInSuccessEntity } from './entities';
+import { UserContextEntity } from './entities/user-context.entity';
+import { AUTH_TOKEN_KEY } from '@/lib/constants';
 
-const ezzyCommMerchantApi = process.env.NEXT_PUBLIC_EZZY_COMM_MERCHANT_API;
-const ezzyCommProductApi = process.env.NEXT_PUBLIC_EZZY_COMM_PRODUCT_API;
-const ezzyCommCustomerApi = process.env.NEXT_PUBLIC_EZZY_COMM_INVENTORY_API;
+const rajniApi = process.env.NEXT_PUBLIC_RAJNI_API_ENDPOINT || '';
 
 const ezzyCommClientKey =
     process.env.NEXT_PUBLIC_EZZY_COMM_PARTNER_WEB_CLIENT_KEY || '';
@@ -29,10 +31,8 @@ export const QUERY_KEYS = {
     PartnerSettings: 'partner-settings'
 };
 
-export const EZZY_TOKEN_NAME = 'ezzy-comm-access-token';
 
-let tenantCode = '';
-let accessToken = '';
+
 // localStorage ? localStorage.getItem(EZZY_TOKEN_NAME) : '';
 
 const getHeaders: () => Record<string, string> = () => {
@@ -43,6 +43,7 @@ const getHeaders: () => Record<string, string> = () => {
         'tenant-code': 'rajni-jewel',
 
     }
+    const accessToken = localStorage.getItem(AUTH_TOKEN_KEY);
     if (accessToken) {
         headers['Authorization'] = `Bearer ${accessToken}`;
     }
@@ -59,11 +60,25 @@ export const appQueryClient = new QueryClient({
     }
 });
 
-export const getWhoAmIApi = async () => {
-    const dataUrl = ezzyCommMerchantApi + '/api/v1/partner/who-am-i';
-    console.log('ggg', getHeaders())
-    return fetch(dataUrl, {
+export const getWhoAmIApi = async (): Promise<UserContextEntity> => {
+    const dataUrl = rajniApi + '/api/v1/auth/who-am-i';
+    const response = await fetch(dataUrl, {
         headers: getHeaders(),
         cache: 'no-store',
     });
+
+    if (!response.ok) throw new Error(response.statusText);
+    return response.json();
+};
+
+export const userSignInApi = async (dto: UserSignInDto): Promise<SignInSuccessEntity> => {
+    const dataUrl = rajniApi + '/api/v1/auth/user/signin';
+    const response = await fetch(dataUrl, {
+        method: 'POST',
+        body: JSON.stringify(dto),
+        headers: getHeaders(),
+        cache: 'no-store',
+    });
+    if (!response.ok) throw new Error(response.statusText);
+    return response.json();
 };
