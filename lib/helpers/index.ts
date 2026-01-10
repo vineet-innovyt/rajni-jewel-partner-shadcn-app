@@ -1,0 +1,1 @@
+export { getBestsellerProducts } from './get-bestseller-products'

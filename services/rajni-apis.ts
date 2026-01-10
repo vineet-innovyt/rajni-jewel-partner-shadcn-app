@@ -1,7 +1,7 @@
 
 import { QueryClient } from '@tanstack/react-query';
 import { UserSignInDto } from './dto';
-import { SignInSuccessEntity } from './entities';
+import { PaginatedResultEntity, ProductEntity, SignInSuccessEntity } from './entities';
 import { UserContextEntity } from './entities/user-context.entity';
 import { AUTH_TOKEN_KEY } from '@/lib/constants';
 
@@ -76,6 +76,16 @@ export const userSignInApi = async (dto: UserSignInDto): Promise<SignInSuccessEn
     const response = await fetch(dataUrl, {
         method: 'POST',
         body: JSON.stringify(dto),
+        headers: getHeaders(),
+        cache: 'no-store',
+    });
+    if (!response.ok) throw new Error(response.statusText);
+    return response.json();
+};
+
+export const productSearchApi = async (pageIndex?: number, pageSize?: number): Promise<PaginatedResultEntity<ProductEntity>> => {
+    const dataUrl = rajniApi + `/api/v1/product/search?page-index=${pageIndex}&page-size=${pageSize}`;
+    const response = await fetch(dataUrl, {
         headers: getHeaders(),
         cache: 'no-store',
     });

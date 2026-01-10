@@ -3,7 +3,11 @@ import { ReactNode, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { QueryProvider } from "@/services/query-provider";
 import { useAuth } from "./auth-context";
-import { AUTH_TOKEN_KEY } from "./constants";
+import {
+  AUTH_TOKEN_KEY,
+  PARTNER_SIGN_IN_PAGE,
+  PARTNER_SIGN_UP_PAGE,
+} from "./constants";
 interface IAppInitCompProps {
   //  tenantCode: string;
   children?: ReactNode;
@@ -20,21 +24,20 @@ export const AppInitComp: React.FC<IAppInitCompProps> = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    console.log("AppInitComp", currentPathname, "currentPathname");
-    const unAuthPaths = ["/partner/auth/sign-in", "/partner/auth/sign-up"];
+    const unAuthPaths = [PARTNER_SIGN_IN_PAGE, PARTNER_SIGN_UP_PAGE];
 
     (async () => {
       setIsLoading(true);
       if (!user && !unAuthPaths.includes(currentPathname)) {
         const authToken = localStorage.getItem(AUTH_TOKEN_KEY);
         if (!authToken) {
-          router.push("/partner/auth/sign-in");
+          router.push(PARTNER_SIGN_IN_PAGE);
         } else {
           try {
             await fetchUserByToken(authToken);
           } catch (error) {
             console.error("Error fetching user context:", error);
-            router.push("/partner/auth/sign-in");
+            router.push(PARTNER_SIGN_IN_PAGE);
           }
         }
       }

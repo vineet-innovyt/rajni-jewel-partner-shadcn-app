@@ -8,9 +8,8 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Jewel - Luxury Jewelry Store",
+  title: "Rajni Jewel - Partner Portal",
   description: "Discover our exquisite collection of fine jewelry",
-  generator: "v0.app",
   icons: {
     icon: [
       {

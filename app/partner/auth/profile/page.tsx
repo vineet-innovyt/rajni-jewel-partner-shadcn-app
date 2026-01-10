@@ -1,49 +1,65 @@
-"use client"
+"use client";
 
-import { useAuth } from "@/lib/auth-context"
-import { useRouter } from "next/navigation"
-import { useEffect } from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import { useAuth } from "@/lib/auth-context";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function ProfilePage() {
-  const { user, isLoading, signOut } = useAuth()
-  const router = useRouter()
+  const { user, isLoading, signOut } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     if (!isLoading && !user) {
-      router.push("/auth/sign-in")
+      router.push("/auth/sign-in");
     }
-  }, [user, isLoading, router])
+  }, [user, isLoading, router]);
 
   if (isLoading) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>
+    return (
+      <div className="flex items-center justify-center h-screen">
+        Loading...
+      </div>
+    );
   }
 
   if (!user) {
-    return null
+    return null;
   }
 
   const handleSignOut = () => {
-    signOut()
-    router.push("/auth/sign-in")
-  }
+    signOut();
+    router.push("/auth/sign-in");
+  };
 
   return (
     <div className="min-h-screen bg-background">
       <nav className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link href="/" className="text-2xl font-bold text-primary">
-            Jewel
+          <Link
+            href="/partner/home"
+            className="text-2xl font-bold text-primary"
+          >
+            Rajni Jewel
           </Link>
           <div className="flex gap-4 items-center">
-            <Link href="/products" className="text-foreground hover:text-primary transition">
+            <Link
+              href="/partner/products"
+              className="text-foreground hover:text-primary transition"
+            >
               Shop
             </Link>
-            <Link href="/cart" className="text-foreground hover:text-primary transition">
+            <Link
+              href="/cart"
+              className="text-foreground hover:tessxt-primary transition"
+            >
               Cart
             </Link>
-            <Link href="/orders" className="text-foreground hover:text-primary transition">
+            <Link
+              href="/orders"
+              className="text-foreground hover:text-primary transition"
+            >
               Orders
             </Link>
           </div>
@@ -61,14 +77,20 @@ export default function ProfilePage() {
 
           <div>
             <label className="text-sm text-muted-foreground">Email</label>
-            <p className="text-xl font-semibold text-foreground">{user.email}</p>
+            <p className="text-xl font-semibold text-foreground">
+              {user.email}
+            </p>
           </div>
 
-          <Button onClick={handleSignOut} variant="destructive" className="w-full">
+          <Button
+            onClick={handleSignOut}
+            variant="destructive"
+            className="w-full"
+          >
             Sign Out
           </Button>
         </div>
       </main>
     </div>
-  )
+  );
 }

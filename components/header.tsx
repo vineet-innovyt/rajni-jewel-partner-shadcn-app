@@ -1,41 +1,53 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { ShoppingCart, LogOut, Menu, X } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { useAuth } from "@/lib/auth-context"
-import { useCart } from "@/lib/cart-context"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
+import Link from "next/link";
+import { ShoppingCart, LogOut, Menu, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/lib/auth-context";
+import { useCart } from "@/lib/cart-context";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import {
+  PARTNER_CART_PAGE,
+  PARTNER_HOME_PAGE,
+  PARTNER_ORDERS_PAGE,
+  PARTNER_PRODUCTS_PAGE,
+} from "@/lib/constants";
 
 export function Header() {
-  const { user, signOut } = useAuth()
-  const { items } = useCart()
-  const router = useRouter()
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { user, signOut } = useAuth();
+  const { items } = useCart();
+  const router = useRouter();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0)
+  const cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
   const handleSignOut = () => {
-    signOut()
-    router.push("/auth/sign-in")
-  }
+    signOut();
+    router.push("/partner/auth/sign-in");
+  };
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-card backdrop-blur-sm">
       <div className="container mx-auto px-4 py-4">
         <div className="flex justify-between items-center">
-          <Link href="/" className="text-2xl font-bold text-primary">
-            Jewel
+          <Link
+            href={PARTNER_HOME_PAGE}
+            className="text-2xl font-bold text-primary"
+          >
+            Rajni Jewel
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex gap-6 items-center">
-            <Link href="/products" className="text-foreground hover:text-primary transition text-sm font-medium">
+            <Link
+              href={PARTNER_PRODUCTS_PAGE}
+              className="text-foreground hover:text-primary transition text-sm font-medium"
+            >
               Shop All
             </Link>
             <Link
-              href="/cart"
+              href={PARTNER_CART_PAGE}
               className="text-foreground hover:text-primary transition text-sm font-medium flex items-center gap-2 relative"
             >
               <ShoppingCart size={18} />
@@ -46,12 +58,22 @@ export function Header() {
                 </span>
               )}
             </Link>
-            <Link href="/orders" className="text-foreground hover:text-primary transition text-sm font-medium">
+            <Link
+              href={PARTNER_ORDERS_PAGE}
+              className="text-foreground hover:text-primary transition text-sm font-medium"
+            >
               Orders
             </Link>
             <div className="flex items-center gap-4 pl-6 border-l border-border">
-              <span className="text-sm text-muted-foreground">{user?.name}</span>
-              <Button variant="ghost" size="sm" onClick={handleSignOut} className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">
+                {user?.displayName || user?.name}
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleSignOut}
+                className="flex items-center gap-2"
+              >
                 <LogOut size={16} />
                 Sign Out
               </Button>
@@ -71,13 +93,13 @@ export function Header() {
         {mobileMenuOpen && (
           <div className="md:hidden mt-4 space-y-3 pb-4">
             <Link
-              href="/products"
+              href={PARTNER_PRODUCTS_PAGE}
               className="block text-foreground hover:text-primary transition text-sm font-medium py-2"
             >
               Shop All
             </Link>
             <Link
-              href="/cart"
+              href={PARTNER_CART_PAGE}
               className="flex items-center gap-2 text-foreground hover:text-primary transition text-sm font-medium py-2 relative"
             >
               <ShoppingCart size={18} />
@@ -89,14 +111,21 @@ export function Header() {
               )}
             </Link>
             <Link
-              href="/orders"
+              href={PARTNER_ORDERS_PAGE}
               className="block text-foreground hover:text-primary transition text-sm font-medium py-2"
             >
               Orders
             </Link>
             <div className="flex items-center gap-2 pt-4 border-t border-border">
-              <span className="text-sm text-muted-foreground flex-1">{user?.name}</span>
-              <Button variant="ghost" size="sm" onClick={handleSignOut} className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground flex-1">
+                {user?.displayName || user?.name}
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleSignOut}
+                className="flex items-center gap-2"
+              >
                 <LogOut size={16} />
                 Sign Out
               </Button>
@@ -105,5 +134,5 @@ export function Header() {
         )}
       </div>
     </nav>
-  )
+  );
 }

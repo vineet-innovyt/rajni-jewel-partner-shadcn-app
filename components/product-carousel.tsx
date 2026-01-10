@@ -1,40 +1,41 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Image from "next/image"
-import type { Product } from "@/lib/types"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ProductEntity } from "@/services/entities";
+import { first } from "lodash";
 
 interface ProductCarouselProps {
-  products: Product[]
-  title: string
+  products: ProductEntity[];
+  title: string;
 }
 
 export function ProductCarousel({ products, title }: ProductCarouselProps) {
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [autoPlay, setAutoPlay] = useState(true)
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [autoPlay, setAutoPlay] = useState(true);
 
   useEffect(() => {
-    if (!autoPlay) return
+    if (!autoPlay) return;
 
     const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % products.length)
-    }, 5000)
+      setCurrentIndex((prev) => (prev + 1) % products.length);
+    }, 5000);
 
-    return () => clearInterval(timer)
-  }, [autoPlay, products.length])
+    return () => clearInterval(timer);
+  }, [autoPlay, products.length]);
 
   const goToPrevious = () => {
-    setCurrentIndex((prev) => (prev - 1 + products.length) % products.length)
-    setAutoPlay(false)
-  }
+    setCurrentIndex((prev) => (prev - 1 + products.length) % products.length);
+    setAutoPlay(false);
+  };
 
   const goToNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % products.length)
-    setAutoPlay(false)
-  }
+    setCurrentIndex((prev) => (prev + 1) % products.length);
+    setAutoPlay(false);
+  };
 
-  const product = products[currentIndex]
+  const product = products[currentIndex];
 
   return (
     <section className="py-12">
@@ -49,8 +50,12 @@ export function ProductCarousel({ products, title }: ProductCarouselProps) {
       >
         <div className="aspect-square md:aspect-video relative">
           <Image
-            src={product.image || "/placeholder.svg"}
-            alt={product.name}
+            src={
+              product.featureImage ||
+              first(product.images)?.url ||
+              "/placeholder.svg"
+            }
+            alt={product.name as string}
             fill
             className="object-cover"
             priority={currentIndex === 0}
@@ -62,7 +67,7 @@ export function ProductCarousel({ products, title }: ProductCarouselProps) {
           <h3 className="text-2xl font-bold mb-2">{product.name}</h3>
           <p className="text-sm text-gray-200 mb-4">{product.description}</p>
           <div className="flex justify-between items-center">
-            <span className="text-3xl font-bold">${product.price.toLocaleString()}</span>
+            <span className="text-3xl font-bold"> </span>
             <button className="bg-primary text-primary-foreground px-6 py-2 rounded-lg hover:opacity-90 transition">
               View Details
             </button>
@@ -92,11 +97,13 @@ export function ProductCarousel({ products, title }: ProductCarouselProps) {
             <button
               key={index}
               onClick={() => {
-                setCurrentIndex(index)
-                setAutoPlay(false)
+                setCurrentIndex(index);
+                setAutoPlay(false);
               }}
               className={`w-2 h-2 rounded-full transition ${
-                index === currentIndex ? "bg-white w-6" : "bg-white/50 hover:bg-white/75"
+                index === currentIndex
+                  ? "bg-white w-6"
+                  : "bg-white/50 hover:bg-white/75"
               }`}
               aria-label={`Go to product ${index + 1}`}
             />
@@ -104,5 +111,5 @@ export function ProductCarousel({ products, title }: ProductCarouselProps) {
         </div>
       </div>
     </section>
-  )
+  );
 }
