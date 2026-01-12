@@ -11,5 +11,6 @@ export const PARTNER_CART_PAGE = "/partner/cart";
 
 export const QUERY_KEYS = {
     Products: 'products',
+    ProductById: 'product-by-id',
     BestSellerProducts: 'best-seller-products',
 }

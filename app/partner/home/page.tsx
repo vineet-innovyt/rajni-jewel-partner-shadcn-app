@@ -82,7 +82,7 @@ export default function Page() {
             finest in luxury craftsmanship and design.
           </p>
           <Link
-            href="/products"
+            href={PARTNER_PRODUCTS_PAGE}
             className="inline-block bg-primary text-primary-foreground px-8 py-3 rounded-lg hover:opacity-90 transition font-medium"
           >
             Shop Now

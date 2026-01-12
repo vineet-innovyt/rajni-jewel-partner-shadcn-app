@@ -9,6 +9,7 @@ import { Header } from "@/components/header";
 import { ChevronDown, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Order } from "@/lib/types";
+import { PARTNER_PRODUCTS_PAGE } from "@/lib/constants";
 
 export default function OrdersPage() {
   const { user, isLoading } = useAuth();
@@ -102,7 +103,7 @@ export default function OrdersPage() {
               <p className="text-lg">No orders yet</p>
             </div>
             <Link
-              href="/products"
+              href={PARTNER_PRODUCTS_PAGE}
               className="inline-block bg-primary text-primary-foreground px-8 py-3 rounded-lg hover:opacity-90 transition font-medium"
             >
               Start Shopping
@@ -176,8 +177,11 @@ export default function OrdersPage() {
                           <div key={item.product.id} className="flex gap-4">
                             <div className="relative w-20 h-20 rounded bg-card border border-border flex-shrink-0">
                               <Image
-                                src={item.product.image || "/placeholder.svg"}
-                                alt={item.product.name}
+                                src={
+                                  item.product.images?.[0]?.url ||
+                                  "/placeholder.svg"
+                                }
+                                alt={item.product.name as string}
                                 fill
                                 className="object-cover rounded"
                               />
@@ -187,14 +191,11 @@ export default function OrdersPage() {
                                 {item.product.name}
                               </h5>
                               <p className="text-sm text-muted-foreground mt-1">
-                                ${item.product.price.toLocaleString()} x{" "}
-                                {item.quantity}
+                                ${1} x {item.quantity}
                               </p>
                               <p className="text-sm font-semibold text-primary mt-1">
                                 $
-                                {(
-                                  item.product.price * item.quantity
-                                ).toLocaleString("en-US", {
+                                {(0 * item.quantity).toLocaleString("en-US", {
                                   maximumFractionDigits: 2,
                                 })}
                               </p>
@@ -263,7 +264,7 @@ export default function OrdersPage() {
                     {/* Action Buttons */}
                     <div className="flex gap-3">
                       <Link
-                        href="/products"
+                        href={PARTNER_PRODUCTS_PAGE}
                         className="flex-1 bg-primary text-primary-foreground py-2 rounded-lg hover:opacity-90 transition font-medium text-center text-sm"
                       >
                         Continue Shopping

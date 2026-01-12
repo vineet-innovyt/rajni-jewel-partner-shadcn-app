@@ -1,3 +1,5 @@
+import { OrderLineItemEntity } from "@/services/entities"
+
 export interface Product {
   id: string
   name: string
@@ -26,14 +28,8 @@ export interface Product {
 
 }
 
-export interface CustomProduct extends Product {
-  isCustom: true
-}
 
-export interface CartItem {
-  product: Product | CustomProduct
-  quantity: number
-}
+export type CartItem = OrderLineItemEntity;
 
 export interface Order {
   id: string
@@ -42,4 +38,21 @@ export interface Order {
   totalPrice: number
   date: string
   status: "completed" | "processing" | "shipped"
+}
+
+export interface IProductMetadata {
+  style?: string,
+  menuHeader?: string,
+  metalColor?: string,
+  metalType?: string,
+  metalPurity?: string,
+  stoneWeightCt?: number,
+  stoneWeightGm?: number,
+  lengthInch?: string,
+  metalRate?: number,
+  metalValue?: number,
+  makingCharges?: number,
+  discountMakingCharges?: number,
+  finalMakingCharges?: number,
+  costPerGram?: number
 }

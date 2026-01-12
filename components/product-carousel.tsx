@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ProductEntity } from "@/services/entities";
-import { first } from "lodash";
+import Link from "next/link";
+import { PARTNER_PRODUCTS_PAGE } from "@/lib/constants";
 
 interface ProductCarouselProps {
   products: ProductEntity[];
@@ -52,7 +53,7 @@ export function ProductCarousel({ products, title }: ProductCarouselProps) {
           <Image
             src={
               product.featureImage ||
-              first(product.images)?.url ||
+              product.images?.[0]?.url ||
               "/placeholder.svg"
             }
             alt={product.name as string}
@@ -68,9 +69,12 @@ export function ProductCarousel({ products, title }: ProductCarouselProps) {
           <p className="text-sm text-gray-200 mb-4">{product.description}</p>
           <div className="flex justify-between items-center">
             <span className="text-3xl font-bold"> </span>
-            <button className="bg-primary text-primary-foreground px-6 py-2 rounded-lg hover:opacity-90 transition">
+            <Link
+              href={`${PARTNER_PRODUCTS_PAGE}/${product.id}`}
+              className="bg-primary text-primary-foreground px-6 py-2 rounded-lg hover:opacity-90 transition"
+            >
               View Details
-            </button>
+            </Link>
           </div>
         </div>
 

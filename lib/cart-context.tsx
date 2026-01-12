@@ -2,19 +2,15 @@
 
 import type React from "react";
 import { createContext, useContext, useEffect, useState } from "react";
-import type { CartItem, Product, CustomProduct } from "./types";
+import type { CartItem } from "./types";
 
 interface CartContextType {
   items: CartItem[];
-  addToCart: (product: Product, quantity?: number) => void;
-  addCustomToCart: (name: string, variant: string, quantity: number) => void;
+  addToCart: (e: CartItem) => void;
+
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
-  updateCustomProduct: (
-    productId: string,
-    name: string,
-    variant: string
-  ) => void;
+  // updateCustomProduct: (e: CartItem) => void;
   clearCart: () => void;
   getTotalPrice: () => number;
 }
@@ -45,40 +41,26 @@ export function CartProvider({
     }
   }, [items, isInitialized]);
 
-  const addToCart = (product: Product, quantity = 1) => {
+  const addToCart = (e: CartItem) => {
     setItems((prevItems) => {
       const existingItem = prevItems.find(
-        (item) => item.product.id === product.id
+        (item) => item.product.id === e.product.id
       );
       if (existingItem) {
         return prevItems.map((item) =>
-          item.product.id === product.id
-            ? { ...item, quantity: item.quantity + quantity }
+          item.product.id === e.product.id
+            ? { ...e, quantity: item.quantity + e.quantity }
             : item
         );
       }
-      return [...prevItems, { product, quantity }];
+      return [
+        ...prevItems,
+        {
+          ...e,
+          lineItemId: Date.now().toString(),
+        },
+      ];
     });
-  };
-
-  const addCustomToCart = (name: string, variant: string, quantity: number) => {
-    const customProduct: CustomProduct = {
-      id: `custom-${Date.now()}`,
-      name,
-      variant,
-      price: 0,
-      isCustom: true,
-      description: "",
-      image: "",
-      category: "",
-      subcategory: "",
-      type: "",
-      inStock: false,
-    };
-    setItems((prevItems) => [
-      ...prevItems,
-      { product: customProduct, quantity },
-    ]);
   };
 
   const removeFromCart = (productId: string) => {
@@ -130,10 +112,7 @@ export function CartProvider({
   };
 
   const getTotalPrice = () => {
-    return items.reduce(
-      (total, item) => total + item.product.price * item.quantity,
-      0
-    );
+    return items.reduce((total, item) => total + 0 * item.quantity, 0);
   };
 
   return (
@@ -141,10 +120,9 @@ export function CartProvider({
       value={{
         items,
         addToCart,
-        addCustomToCart,
         removeFromCart,
         updateQuantity,
-        updateCustomProduct,
+        //  updateCustomProduct,
         clearCart,
         getTotalPrice,
       }}

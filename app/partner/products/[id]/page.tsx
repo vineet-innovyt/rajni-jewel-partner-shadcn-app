@@ -1,20 +1,31 @@
-import { notFound } from "next/navigation"
-import { products } from "@/lib/products-data"
-import ProductPageClient from "./page.client.tsx"
+"use client";
 
-export async function generateStaticParams() {
-  return products.map((product) => ({
-    id: product.id,
-  }))
-}
+import { notFound, useParams } from "next/navigation";
+import { ProductPageClient } from "./ProductPageClient";
+import { QUERY_KEYS } from "@/lib/constants";
+import { useQuery } from "@tanstack/react-query";
+import { getProductByIdApi } from "@/services/rajni-apis";
+import { PageLoading } from "@/lib/app-init";
 
-export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
-  const product = products.find((p) => p.id === id)
+export default function ProductPage() {
+  const params = useParams<{ id: string }>();
 
-  if (!product) {
-    notFound()
+  const {
+    data: product,
+    isLoading,
+    isFetching,
+  } = useQuery({
+    queryKey: [QUERY_KEYS.ProductById, params.id],
+    queryFn: () => getProductByIdApi(params.id),
+  });
+
+  if (isLoading) {
+    return <PageLoading />;
   }
 
-  return <ProductPageClient />
+  if (!product) {
+    notFound();
+  }
+
+  return <ProductPageClient product={product} />;
 }

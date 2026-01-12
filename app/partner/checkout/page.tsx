@@ -175,7 +175,7 @@ export default function CheckoutPage() {
                 View Orders
               </Link>
               <Link
-                href="/products"
+                href={PARTNER_PRODUCTS_PAGE}
                 className="block w-full border border-border text-foreground py-3 rounded-lg hover:bg-secondary transition font-medium"
               >
                 Continue Shopping

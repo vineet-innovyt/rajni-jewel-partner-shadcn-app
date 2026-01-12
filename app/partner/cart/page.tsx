@@ -8,46 +8,24 @@ import Link from "next/link";
 import Image from "next/image";
 import { Header } from "@/components/header";
 import { ShoppingCart, Trash2, Plus, Minus, Edit2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { AddCustomProduct } from "@/components/add-custom-product";
+import {
+  AddCustomProduct,
+  AddCustomProductModal,
+} from "@/components/add-custom-product";
+import { PARTNER_PRODUCTS_PAGE } from "@/lib/constants";
 
 export default function CartPage() {
   const { user, isLoading } = useAuth();
-  const {
-    items,
-    removeFromCart,
-    updateQuantity,
-    getTotalPrice,
-    updateCustomProduct,
-  } = useCart();
+  const { items, addToCart, removeFromCart, updateQuantity, getTotalPrice } =
+    useCart();
   const router = useRouter();
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editName, setEditName] = useState("");
-  const [editVariant, setEditVariant] = useState("");
+  const [editProductId, seteEditProductId] = useState<string>("");
 
   useEffect(() => {
     if (!isLoading && !user) {
       router.push("/auth/sign-in");
     }
   }, [user, isLoading, router]);
-
-  const handleSaveEdit = (productId: string) => {
-    if (editName.trim() && editVariant.trim()) {
-      updateCustomProduct(productId, editName.trim(), editVariant.trim());
-      setEditingId(null);
-    }
-  };
-
-  const handleEditCustom = (
-    productId: string,
-    name: string,
-    variant: string
-  ) => {
-    setEditingId(productId);
-    setEditName(name);
-    setEditVariant(variant);
-  };
 
   if (isLoading) {
     return (
@@ -81,7 +59,7 @@ export default function CartPage() {
               <p className="text-lg">Your cart is empty</p>
             </div>
             <Link
-              href="/products"
+              href={PARTNER_PRODUCTS_PAGE}
               className="inline-block bg-primary text-primary-foreground px-8 py-3 rounded-lg hover:opacity-90 transition font-medium"
             >
               Continue Shopping
@@ -94,9 +72,7 @@ export default function CartPage() {
               <AddCustomProduct />
 
               {items.map((item) => {
-                const isCustom =
-                  "isCustom" in item.product && item.product.isCustom;
-                const isEditing = editingId === item.product.id;
+                const isCustom = item.isCustomProduct;
 
                 return (
                   <div
@@ -105,13 +81,16 @@ export default function CartPage() {
                   >
                     {!isCustom && (
                       <Link
-                        href={`/products/${item.product.id}`}
-                        className="flex-shrink-0"
+                        href={`${PARTNER_PRODUCTS_PAGE}/${item.product.id}`}
+                        className="shrink-0"
                       >
                         <div className="relative w-24 h-24 rounded-lg overflow-hidden bg-secondary">
                           <Image
-                            src={item.product.image || "/placeholder.svg"}
-                            alt={item.product.name}
+                            src={
+                              item.product.images?.[0]?.url ||
+                              "/placeholder.svg"
+                            }
+                            alt={item.product.name as string}
                             fill
                             className="object-cover"
                           />
@@ -127,75 +106,35 @@ export default function CartPage() {
                     )}
 
                     <div className="flex-grow flex flex-col justify-between">
-                      {isEditing ? (
-                        <div className="space-y-2 mb-2">
-                          <Input
-                            placeholder="Product Name"
-                            value={editName}
-                            onChange={(e) => setEditName(e.target.value)}
-                            className="text-sm"
-                          />
-                          <Input
-                            placeholder="Variant"
-                            value={editVariant}
-                            onChange={(e) => setEditVariant(e.target.value)}
-                            className="text-sm"
-                          />
-                          <div className="flex gap-2">
-                            <Button
-                              size="sm"
-                              className="flex-1 bg-primary text-primary-foreground hover:opacity-90"
-                              onClick={() => handleSaveEdit(item.product.id)}
-                            >
-                              Save
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="flex-1 bg-transparent"
-                              onClick={() => setEditingId(null)}
-                            >
-                              Cancel
-                            </Button>
-                          </div>
+                      <div>
+                        <div className="text-foreground font-semibold">
+                          {item.product.name}
                         </div>
-                      ) : (
-                        <div>
-                          <div className="text-foreground font-semibold">
-                            {item.product.name}
-                          </div>
-                          {isCustom && (
+                        {/* {item.isCustomProduct && (
+                          <p className="text-sm text-muted-foreground mt-1">
+                            Variant:
+                          </p>
+                        )} */}
+                        {/* {!isCustom && (
+                          <p className="text-sm text-muted-foreground mt-1">
+                            ${0}
+                          </p>
+                        )} */}
+                        {isCustom && (
+                          <div className="flex flex-row gap-2">
                             <p className="text-sm text-muted-foreground mt-1">
-                              Variant: {item.product.variant}
+                              Custom Product
                             </p>
-                          )}
-                          {!isCustom && (
-                            <p className="text-sm text-muted-foreground mt-1">
-                              ${item.product.price.toLocaleString()}
-                            </p>
-                          )}
-                          {isCustom && (
-                            <p className="text-sm text-muted-foreground mt-1">
-                              Price: Custom Quote
-                            </p>
-                          )}
-                          {isCustom && (
                             <button
-                              onClick={() =>
-                                handleEditCustom(
-                                  item.product.id,
-                                  item.product.name,
-                                  item.product.variant
-                                )
-                              }
-                              className="text-primary hover:text-primary/80 transition text-sm mt-2 flex items-center gap-1"
+                              onClick={() => seteEditProductId(item.product.id)}
+                              className="text-primary cursor-pointer hover:text-primary/80 transition text-sm flex items-center gap-1  mt-1"
                             >
                               <Edit2 size={14} />
                               Edit
                             </button>
-                          )}
-                        </div>
-                      )}
+                          </div>
+                        )}
+                      </div>
 
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 border border-border rounded-lg p-1">
@@ -223,19 +162,8 @@ export default function CartPage() {
                         </div>
 
                         <div className="text-right">
-                          {!isCustom && (
-                            <p className="font-semibold text-primary">
-                              $
-                              {(
-                                item.product.price * item.quantity
-                              ).toLocaleString()}
-                            </p>
-                          )}
-                          {isCustom && (
-                            <p className="font-semibold text-muted-foreground">
-                              —
-                            </p>
-                          )}
+                          <p className="font-semibold text-muted-foreground"></p>
+
                           <button
                             onClick={() => removeFromCart(item.product.id)}
                             className="text-destructive hover:text-destructive/80 transition text-sm mt-1 flex items-center gap-1"
@@ -250,7 +178,11 @@ export default function CartPage() {
                 );
               })}
             </div>
-
+            <AddCustomProductModal
+              editProductId={editProductId || ""}
+              isOpen={editProductId?.length ? true : false}
+              onClose={() => seteEditProductId("")}
+            />
             {/* Order Summary */}
             <div className="lg:col-span-1">
               <div className="bg-card border border-border rounded-lg p-6 sticky top-24 space-y-4">
@@ -298,7 +230,7 @@ export default function CartPage() {
                 </Link>
 
                 <Link
-                  href="/products"
+                  href={PARTNER_PRODUCTS_PAGE}
                   className="block w-full border border-border text-foreground py-3 rounded-lg hover:bg-secondary transition font-medium text-center"
                 >
                   Continue Shopping

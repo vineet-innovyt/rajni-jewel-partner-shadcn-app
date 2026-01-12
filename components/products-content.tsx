@@ -1,19 +1,19 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/product-card";
 import { ProductFilters, type FilterState } from "@/components/product-filters";
 import { Header } from "@/components/header";
-import { products } from "@/lib/products-data";
 import { useCart } from "@/lib/cart-context";
-import { PARTNER_SIGN_IN_PAGE } from "@/lib/constants";
+import { QUERY_KEYS } from "@/lib/constants";
+import { useQuery } from "@tanstack/react-query";
+import { productSearchApi } from "@/services/rajni-apis";
 
 export function ProductsContent() {
-  const { user, isLoading } = useAuth();
+  const { user } = useAuth();
   const { addToCart } = useCart();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -26,37 +26,43 @@ export function ProductsContent() {
     priceRange: [0, 20000],
   });
 
-  useEffect(() => {
-    if (!isLoading && !user) {
-      router.push(PARTNER_SIGN_IN_PAGE);
-    }
-  }, [user, isLoading, router]);
+  const {
+    data: searchResult,
+    refetch,
+    isLoading,
+  } = useQuery({
+    queryKey: [QUERY_KEYS.Products],
+    queryFn: () => productSearchApi(0, 100),
+  });
 
-  const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
-      if (filters.category && product.category !== filters.category)
-        return false;
-      if (filters.subcategory && product.subcategory !== filters.subcategory)
-        return false;
-      if (filters.type && product.type !== filters.type) return false;
-      if (filters.searchQuery) {
-        const query = filters.searchQuery.toLowerCase();
-        if (
-          !product.name.toLowerCase().includes(query) &&
-          !product.description.toLowerCase().includes(query)
-        ) {
-          return false;
-        }
-      }
-      if (
-        product.price < filters.priceRange[0] ||
-        product.price > filters.priceRange[1]
-      )
-        return false;
-      return true;
-    });
-  }, [filters]);
+  const products = searchResult ? searchResult.items : [];
 
+  // const filteredProducts = useMemo(() => {
+  //   return products;
+  //   // return products.filter((product) => {
+  //   //   if (filters.category && product.categories !== filters.category)
+  //   //     return false;
+  //   //   if (filters.subcategory && product.subcategory !== filters.subcategory)
+  //   //     return false;
+  //   //   if (filters.type && product.type !== filters.type) return false;
+  //   //   if (filters.searchQuery) {
+  //   //     const query = filters.searchQuery.toLowerCase();
+  //   //     if (
+  //   //       !product.name.toLowerCase().includes(query) &&
+  //   //       !product.description.toLowerCase().includes(query)
+  //   //     ) {
+  //   //       return false;
+  //   //     }
+  //   //   }
+  //   //   if (
+  //   //     product.price < filters.priceRange[0] ||
+  //   //     product.price > filters.priceRange[1]
+  //   //   )
+  //   //     return false;
+  //   //   return true;
+  //   // });
+  // }, [filters]);
+  const filteredProducts = products;
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">

@@ -92,3 +92,13 @@ export const productSearchApi = async (pageIndex?: number, pageSize?: number): P
     if (!response.ok) throw new Error(response.statusText);
     return response.json();
 };
+
+export const getProductByIdApi = async (id: string): Promise<ProductEntity> => {
+    const dataUrl = rajniApi + `/api/v1/product/${id}`;
+    const response = await fetch(dataUrl, {
+        headers: getHeaders(),
+        cache: 'no-store',
+    });
+    if (!response.ok) throw new Error(response.statusText);
+    return response.json();
+};

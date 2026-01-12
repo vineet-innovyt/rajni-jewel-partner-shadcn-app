@@ -45,13 +45,13 @@ export const AppInitComp: React.FC<IAppInitCompProps> = ({ children }) => {
     })();
   }, [user, router]);
 
-  if (isLoading) return <Loading />;
+  if (isLoading) return <PageLoading />;
 
   return <QueryProvider>{children}</QueryProvider>;
 };
 
 // You can use a lightweight component here, even a simple message or a custom spinner
-export function Loading() {
+export function PageLoading() {
   return (
     <div
       style={{

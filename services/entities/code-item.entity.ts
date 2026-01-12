@@ -1,7 +1,9 @@
 
 export class CodeItemEntity {
-    id?: string;
-    name?: string;
+    constructor(partial: Partial<CodeItemEntity>) {
+        Object.assign(this, partial);
+    }
+
     code?: string;
     value?: string;
 }
