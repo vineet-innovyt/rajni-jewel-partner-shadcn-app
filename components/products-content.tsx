@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/product-card";
 import { ProductFilters, type FilterState } from "@/components/product-filters";
@@ -16,7 +16,9 @@ export function ProductsContent() {
   const { user } = useAuth();
   const { addToCart } = useCart();
   const router = useRouter();
-  //const searchParams = useSearchParams();
+
+  const searchParams = useSearchParams();
+  const qsCategory = searchParams.get("category")?.trim().toLowerCase();
 
   const [filters, setFilters] = useState<FilterState>({
     categoryIds: [],
@@ -36,6 +38,27 @@ export function ProductsContent() {
   });
 
   const products = searchResult ? searchResult.items : [];
+
+  useEffect(() => {
+    if (qsCategory) {
+      let categoryId = "";
+      for (const product of products) {
+        const match = product.categories?.find((c) =>
+          c.value?.toLowerCase().includes(qsCategory)
+        );
+        if (match) {
+          categoryId = match.code as string;
+          break;
+        }
+      }
+      if (categoryId) {
+        setFilters({
+          ...filters,
+          categoryIds: [categoryId],
+        });
+      }
+    }
+  }, [qsCategory, products]);
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
