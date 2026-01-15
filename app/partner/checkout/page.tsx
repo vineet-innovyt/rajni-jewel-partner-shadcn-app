@@ -7,11 +7,11 @@ import { useCart } from "@/lib/cart-context";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { Header } from "@/components/header";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PARTNER_PRODUCTS_PAGE } from "@/lib/constants";
 
 interface ShippingInfo {
   firstName: string;
@@ -455,12 +455,12 @@ export default function CheckoutPage() {
                 {items.map((item) => (
                   <div key={item.product.id} className="flex gap-3">
                     <div className="relative w-16 h-16 rounded bg-secondary flex-shrink-0">
-                      <Image
+                      {/* <Image
                         src={item.product.image || "/placeholder.svg"}
                         alt={item.product.name}
                         fill
                         className="object-cover rounded"
-                      />
+                      /> */}
                     </div>
                     <div className="flex-grow text-sm">
                       <p className="text-foreground font-medium line-clamp-1">
@@ -469,9 +469,7 @@ export default function CheckoutPage() {
                       <p className="text-muted-foreground">
                         Qty: {item.quantity}
                       </p>
-                      <p className="text-primary font-semibold">
-                        ${(item.product.price * item.quantity).toLocaleString()}
-                      </p>
+                      <p className="text-primary font-semibold">${0}</p>
                     </div>
                   </div>
                 ))}

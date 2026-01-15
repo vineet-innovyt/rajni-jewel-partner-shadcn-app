@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/product-card";
 import { ProductFilters, type FilterState } from "@/components/product-filters";
@@ -16,12 +16,12 @@ export function ProductsContent() {
   const { user } = useAuth();
   const { addToCart } = useCart();
   const router = useRouter();
-  const searchParams = useSearchParams();
+  //const searchParams = useSearchParams();
 
   const [filters, setFilters] = useState<FilterState>({
-    category: searchParams.get("category") || "",
+    categoryIds: [],
     subcategory: "",
-    type: "",
+    typeIds: [],
     searchQuery: "",
     priceRange: [0, 20000],
   });
@@ -32,37 +32,45 @@ export function ProductsContent() {
     isLoading,
   } = useQuery({
     queryKey: [QUERY_KEYS.Products],
-    queryFn: () => productSearchApi(0, 100),
+    queryFn: () => productSearchApi(0, 500),
   });
 
   const products = searchResult ? searchResult.items : [];
 
-  // const filteredProducts = useMemo(() => {
-  //   return products;
-  //   // return products.filter((product) => {
-  //   //   if (filters.category && product.categories !== filters.category)
-  //   //     return false;
-  //   //   if (filters.subcategory && product.subcategory !== filters.subcategory)
-  //   //     return false;
-  //   //   if (filters.type && product.type !== filters.type) return false;
-  //   //   if (filters.searchQuery) {
-  //   //     const query = filters.searchQuery.toLowerCase();
-  //   //     if (
-  //   //       !product.name.toLowerCase().includes(query) &&
-  //   //       !product.description.toLowerCase().includes(query)
-  //   //     ) {
-  //   //       return false;
-  //   //     }
-  //   //   }
-  //   //   if (
-  //   //     product.price < filters.priceRange[0] ||
-  //   //     product.price > filters.priceRange[1]
-  //   //   )
-  //   //     return false;
-  //   //   return true;
-  //   // });
-  // }, [filters]);
-  const filteredProducts = products;
+  const filteredProducts = useMemo(() => {
+    return products.filter((product) => {
+      const productCategoryIds =
+        product.categories?.map((o) => o.code as string) || [];
+      if (
+        filters.categoryIds?.length &&
+        !filters.categoryIds.some((o) => productCategoryIds.includes(o))
+      )
+        return false;
+      // if (filters.subcategory && product.subcategory !== filters.subcategory)
+      //   return false;
+      if (
+        filters.typeIds?.length &&
+        !filters.typeIds.includes(product.type?.code as string)
+      )
+        return false;
+      if (filters.searchQuery?.trim().length) {
+        const query = filters.searchQuery.toLowerCase();
+        if (
+          !product.name?.toLowerCase().includes(query) &&
+          !product.description?.toLowerCase().includes(query)
+        ) {
+          return false;
+        }
+      }
+      // if (
+      //   product.price < filters.priceRange[0] ||
+      //   product.price > filters.priceRange[1]
+      // )
+      //   return false;
+      return true;
+    });
+  }, [products, filters]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -93,7 +101,11 @@ export function ProductsContent() {
           {/* Sidebar Filters */}
           <div className="lg:col-span-1">
             <div className="sticky top-20 bg-card border border-border rounded-lg p-4">
-              <ProductFilters filters={filters} onFilterChange={setFilters} />
+              <ProductFilters
+                products={products}
+                filters={filters}
+                onFilterChange={setFilters}
+              />
             </div>
           </div>
 
@@ -107,9 +119,9 @@ export function ProductsContent() {
                 <Button
                   onClick={() =>
                     setFilters({
-                      category: "",
+                      categoryIds: [],
                       subcategory: "",
-                      type: "",
+                      typeIds: [],
                       searchQuery: "",
                       priceRange: [0, 20000],
                     })

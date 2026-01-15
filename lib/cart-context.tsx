@@ -48,9 +48,7 @@ export function CartProvider({
       );
       if (existingItem) {
         return prevItems.map((item) =>
-          item.product.id === e.product.id
-            ? { ...e, quantity: item.quantity + e.quantity }
-            : item
+          item.product.id === e.product.id ? { ...e } : item
         );
       }
       return [

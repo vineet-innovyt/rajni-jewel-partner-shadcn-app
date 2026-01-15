@@ -85,6 +85,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return userContext;
     } catch (error) {
       console.error("Error fetching user context:", error);
+      throw error;
     }
   };
 

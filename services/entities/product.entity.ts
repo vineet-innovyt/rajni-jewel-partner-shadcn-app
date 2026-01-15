@@ -16,7 +16,6 @@ export class ProductAttribute {
 
 export class ProductEntity extends BaseEntity {
 
-
     externalId?: string;
 
 

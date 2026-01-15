@@ -1,80 +1,110 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { ChevronDown } from "lucide-react"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ChevronDown } from "lucide-react";
+import { CodeItemEntity, ProductEntity } from "@/services/entities";
+import { flatMap, sortBy, uniqBy } from "lodash-es";
 
 export interface FilterState {
-  category: string
-  subcategory: string
-  type: string
-  searchQuery: string
-  priceRange: [number, number]
+  categoryIds: string[];
+  subcategory: string;
+  typeIds: string[];
+  searchQuery: string;
+  priceRange: [number, number];
 }
 
 interface ProductFiltersProps {
-  filters: FilterState
-  onFilterChange: (filters: FilterState) => void
+  products: ProductEntity[];
+  filters: FilterState;
+  onFilterChange: (filters: FilterState) => void;
 }
 
-export function ProductFilters({ filters, onFilterChange }: ProductFiltersProps) {
+export function ProductFilters({
+  products,
+  filters,
+  onFilterChange,
+}: ProductFiltersProps) {
   const [expandedSections, setExpandedSections] = useState({
     category: true,
     price: true,
     type: true,
-  })
-
-  const categories = [
-    { id: "rings", name: "Rings" },
-    { id: "necklaces", name: "Necklaces" },
-    { id: "bracelets", name: "Bracelets" },
-    { id: "earrings", name: "Earrings" },
-  ]
+  });
 
   const subcategories: Record<string, string[]> = {
     rings: ["gold", "diamond", "gemstone"],
     necklaces: ["gold", "pearl", "diamond"],
     bracelets: ["gold", "pearl", "tennis"],
     earrings: ["stud", "drop", "hoop"],
-  }
+  };
 
-  const types = ["wedding", "engagement", "pendant", "tennis", "cocktail", "chain", "statement", "bangle"]
+  const types = sortBy(
+    uniqBy(
+      products.filter((o) => o.type).map((o) => o.type as CodeItemEntity),
+      (o) => o.code || ""
+    ),
+    (o) => o.value as string
+  );
 
-  const handleCategoryChange = (category: string) => {
+  const handleCategoryChange = (categoryId: string) => {
+    let categoryIds = [...filters.categoryIds];
+    if (filters.categoryIds.includes(categoryId)) {
+      categoryIds = categoryIds.filter((c) => c !== categoryId);
+    } else {
+      categoryIds.push(categoryId);
+    }
+
     onFilterChange({
       ...filters,
-      category,
+      categoryIds,
       subcategory: "",
-    })
-  }
+    });
+  };
 
   const handleSubcategoryChange = (subcategory: string) => {
     onFilterChange({
       ...filters,
       subcategory: filters.subcategory === subcategory ? "" : subcategory,
-    })
-  }
+    });
+  };
 
-  const handleTypeChange = (type: string) => {
+  const handleTypeChange = (typeId: string) => {
+    let typeIds = [...filters.typeIds];
+    if (filters.typeIds.includes(typeId)) {
+      typeIds = typeIds.filter((c) => c !== typeId);
+    } else {
+      typeIds.push(typeId);
+    }
+
     onFilterChange({
       ...filters,
-      type: filters.type === type ? "" : type,
-    })
-  }
+      typeIds,
+    });
+  };
 
   const toggleSection = (section: keyof typeof expandedSections) => {
     setExpandedSections((prev) => ({
       ...prev,
       [section]: !prev[section],
-    }))
-  }
+    }));
+  };
+
+  const categories = sortBy(
+    uniqBy(
+      flatMap(products.map((o) => o.categories || [])),
+      (o) => o.code || ""
+    ),
+    (o) => o.value as string
+  );
 
   return (
     <div className="space-y-4">
       {/* Search */}
       <div>
-        <label className="block text-sm font-semibold text-foreground mb-2">Search</label>
+        <label className="block text-sm font-semibold text-foreground mb-2">
+          Search
+        </label>
         <Input
           type="text"
           placeholder="Search products..."
@@ -96,20 +126,30 @@ export function ProductFilters({ filters, onFilterChange }: ProductFiltersProps)
           className="flex justify-between items-center w-full text-sm font-semibold text-foreground hover:text-primary transition mb-3"
         >
           Category
-          <ChevronDown size={16} className={`transition ${expandedSections.category ? "rotate-180" : ""}`} />
+          <ChevronDown
+            size={16}
+            className={`transition ${
+              expandedSections.category ? "rotate-180" : ""
+            }`}
+          />
         </button>
         {expandedSections.category && (
           <div className="space-y-2">
             {categories.map((cat) => (
-              <label key={cat.id} className="flex items-center gap-2 cursor-pointer">
+              <label
+                key={cat.code}
+                className="flex items-center gap-2 cursor-pointer"
+              >
                 <input
-                  type="radio"
+                  type="checkbox"
                   name="category"
-                  checked={filters.category === cat.id}
-                  onChange={() => handleCategoryChange(cat.id)}
+                  checked={filters.categoryIds.includes(cat.code as string)}
+                  onChange={() => handleCategoryChange(cat.code as string)}
                   className="w-4 h-4"
                 />
-                <span className="text-sm text-muted-foreground">{cat.name}</span>
+                <span className="text-sm text-muted-foreground">
+                  {cat.value}
+                </span>
               </label>
             ))}
           </div>
@@ -117,24 +157,31 @@ export function ProductFilters({ filters, onFilterChange }: ProductFiltersProps)
       </div>
 
       {/* Subcategory Filter */}
-      {filters.category && (
+      {/* {filters.categoryIds && (
         <div className="border-t border-border pt-4">
-          <label className="block text-sm font-semibold text-foreground mb-3">Material/Type</label>
+          <label className="block text-sm font-semibold text-foreground mb-3">
+            Material/Type
+          </label>
           <div className="space-y-2">
-            {(subcategories[filters.category] || []).map((subcat) => (
-              <label key={subcat} className="flex items-center gap-2 cursor-pointer">
+            {(subcategories[filters.categoryIds] || []).map((subcat) => (
+              <label
+                key={subcat}
+                className="flex items-center gap-2 cursor-pointer"
+              >
                 <input
                   type="checkbox"
                   checked={filters.subcategory === subcat}
                   onChange={() => handleSubcategoryChange(subcat)}
                   className="w-4 h-4"
                 />
-                <span className="text-sm text-muted-foreground capitalize">{subcat}</span>
+                <span className="text-sm text-muted-foreground capitalize">
+                  {subcat}
+                </span>
               </label>
             ))}
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Product Type Filter */}
       <div className="border-t border-border pt-4">
@@ -143,19 +190,29 @@ export function ProductFilters({ filters, onFilterChange }: ProductFiltersProps)
           className="flex justify-between items-center w-full text-sm font-semibold text-foreground hover:text-primary transition mb-3"
         >
           Product Type
-          <ChevronDown size={16} className={`transition ${expandedSections.type ? "rotate-180" : ""}`} />
+          <ChevronDown
+            size={16}
+            className={`transition ${
+              expandedSections.type ? "rotate-180" : ""
+            }`}
+          />
         </button>
         {expandedSections.type && (
           <div className="space-y-2">
             {types.map((type) => (
-              <label key={type} className="flex items-center gap-2 cursor-pointer">
+              <label
+                key={type.code}
+                className="flex items-center gap-2 cursor-pointer"
+              >
                 <input
                   type="checkbox"
-                  checked={filters.type === type}
-                  onChange={() => handleTypeChange(type)}
+                  checked={filters.typeIds.includes(type.code as string)}
+                  onChange={() => handleTypeChange(type.code as string)}
                   className="w-4 h-4"
                 />
-                <span className="text-sm text-muted-foreground capitalize">{type}</span>
+                <span className="text-sm text-muted-foreground capitalize">
+                  {type.value}
+                </span>
               </label>
             ))}
           </div>
@@ -167,9 +224,9 @@ export function ProductFilters({ filters, onFilterChange }: ProductFiltersProps)
         variant="outline"
         onClick={() =>
           onFilterChange({
-            category: "",
+            categoryIds: [],
             subcategory: "",
-            type: "",
+            typeIds: [],
             searchQuery: "",
             priceRange: [0, 20000],
           })
@@ -179,5 +236,5 @@ export function ProductFilters({ filters, onFilterChange }: ProductFiltersProps)
         Reset Filters
       </Button>
     </div>
-  )
+  );
 }

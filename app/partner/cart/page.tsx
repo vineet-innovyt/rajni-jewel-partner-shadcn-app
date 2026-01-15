@@ -7,12 +7,24 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Header } from "@/components/header";
-import { ShoppingCart, Trash2, Plus, Minus, Edit2 } from "lucide-react";
+import { ShoppingCart, Trash2, Plus, Minus, Edit2, Loader } from "lucide-react";
 import {
   AddCustomProduct,
   AddCustomProductModal,
 } from "@/components/add-custom-product";
 import { PARTNER_PRODUCTS_PAGE } from "@/lib/constants";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export default function CartPage() {
   const { user, isLoading } = useAuth();
@@ -20,6 +32,7 @@ export default function CartPage() {
     useCart();
   const router = useRouter();
   const [editProductId, seteEditProductId] = useState<string>("");
+  const [isOrderPlacing, setIsOrderPlacing] = useState(false);
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -43,6 +56,14 @@ export default function CartPage() {
   const tax = subtotal * 0.08; // 8% tax
   const total = subtotal + tax;
 
+  const onPlaceOrder = async () => {
+    try {
+      setIsOrderPlacing(true);
+    } catch (ex) {
+      console.error("failed onPlaceOrder", ex);
+    }
+    setIsOrderPlacing(false);
+  };
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -100,7 +121,7 @@ export default function CartPage() {
                     {isCustom && (
                       <div className="flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden bg-secondary flex items-center justify-center">
                         <span className="text-xs text-muted-foreground text-center px-2">
-                          Custom Item
+                          No image
                         </span>
                       </div>
                     )}
@@ -142,8 +163,9 @@ export default function CartPage() {
                             onClick={() =>
                               updateQuantity(item.product.id, item.quantity - 1)
                             }
-                            className="p-1 hover:bg-secondary rounded transition"
+                            className="p-1 hover:bg-secondary rounded transition disabled:bg-gray-100 disabled:cursor-not-allowed"
                             aria-label="Decrease quantity"
+                            disabled={item.quantity === 1}
                           >
                             <Minus size={16} />
                           </button>
@@ -222,12 +244,33 @@ export default function CartPage() {
                   </span>
                 </div>
 
-                <Link
-                  href="/checkout"
-                  className="block w-full bg-primary text-primary-foreground py-3 rounded-lg hover:opacity-90 transition font-medium text-center"
-                >
-                  Proceed to Checkout
-                </Link>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      disabled={isOrderPlacing}
+                      className="  w-full flex flex-row bg-primary text-primary-foreground py-3 rounded-lg hover:opacity-90 transition font-medium text-center  disabled:text-black disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-200"
+                    >
+                      {isOrderPlacing && (
+                        <Loader className="w-5 h-5 animate-spin" />
+                      )}
+                      Place Order
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Confirm</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Click confirm to place your order.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={onPlaceOrder}>
+                        Confirm
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
 
                 <Link
                   href={PARTNER_PRODUCTS_PAGE}

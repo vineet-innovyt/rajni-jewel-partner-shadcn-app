@@ -10,5 +10,5 @@ export class OrderLineItemEntity {
     quantity!: number;
 
     product!: ProductEntity;
-    productVarinat?: ProductEntity;
+    productVariant?: ProductEntity;
 }

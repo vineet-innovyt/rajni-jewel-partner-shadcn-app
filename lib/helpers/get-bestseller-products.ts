@@ -1,5 +1,5 @@
 import { ProductEntity } from "@/services/entities";
-import { take } from "lodash";
+import { take } from "lodash-es";
 
 const MAX = 10;
 export const getBestsellerProducts = (products?: ProductEntity[]) => {

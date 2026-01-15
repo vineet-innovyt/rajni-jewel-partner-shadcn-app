@@ -1,6 +1,6 @@
 
 import { QueryClient } from '@tanstack/react-query';
-import { UserSignInDto } from './dto';
+import { OrderCreateDto, UserSignInDto } from './dto';
 import { PaginatedResultEntity, ProductEntity, SignInSuccessEntity } from './entities';
 import { UserContextEntity } from './entities/user-context.entity';
 import { AUTH_TOKEN_KEY } from '@/lib/constants';
@@ -102,3 +102,17 @@ export const getProductByIdApi = async (id: string): Promise<ProductEntity> => {
     if (!response.ok) throw new Error(response.statusText);
     return response.json();
 };
+
+export const createOrderApi = async (dto: OrderCreateDto): Promise<OrderEntity> => {
+    const dataUrl = rajniApi + `/api/v1/order`;
+    const response = await fetch(dataUrl, {
+        method: 'POST',
+        headers: getHeaders(),
+        cache: 'no-store',
+         body: JSON.stringify(dto),
+    });
+    if (!response.ok) throw new Error(response.statusText);
+    return response.json();
+};
+
+

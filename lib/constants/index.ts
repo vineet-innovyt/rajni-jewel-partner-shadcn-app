@@ -7,6 +7,7 @@ export const PARTNER_SIGN_UP_PAGE = "/partner/auth/sign-up";
 export const PARTNER_PRODUCTS_PAGE = "/partner/products";
 export const PARTNER_ORDERS_PAGE = "/partner/orders";
 export const PARTNER_CART_PAGE = "/partner/cart";
+export const CART_CHECKOUT_PAGE = "/partner/checkout";
 
 
 export const QUERY_KEYS = {

@@ -5,12 +5,12 @@ import Link from "next/link";
 import { Heart, ShoppingCart, Plus, Minus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart-context";
-import { ProductEntity } from "@/services/entities";
+import { OrderLineItemEntity, ProductEntity } from "@/services/entities";
 import { PARTNER_PRODUCTS_PAGE } from "@/lib/constants";
 
 interface ProductCardProps {
   product: ProductEntity;
-  onAddToCart: (product: ProductEntity) => void;
+  onAddToCart: (product: OrderLineItemEntity) => void;
 }
 
 export function ProductCard({ product, onAddToCart }: ProductCardProps) {
@@ -98,7 +98,17 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
               </div>
             ) : (
               <Button
-                onClick={() => onAddToCart(product)}
+                onClick={() =>
+                  onAddToCart(
+                    cartItem || {
+                      lineItemId: Date.now().toString(),
+                      productId: product.id as string,
+                      product,
+                      quantity: 1,
+                      isCustomProduct: false,
+                    }
+                  )
+                }
                 size="sm"
                 className="flex items-center gap-1"
               >
