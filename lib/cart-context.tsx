@@ -3,6 +3,7 @@
 import type React from "react";
 import { createContext, useContext, useEffect, useState } from "react";
 import type { CartItem } from "./types";
+import { OrderEntity } from "@/services/entities/order.entity";
 
 interface CartContextType {
   items: CartItem[];
@@ -13,6 +14,8 @@ interface CartContextType {
   // updateCustomProduct: (e: CartItem) => void;
   clearCart: () => void;
   getTotalPrice: () => number;
+  setCurrentOrder: (e: OrderEntity | null) => void;
+  currentOrder: OrderEntity | null;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -24,6 +27,9 @@ export function CartProvider({
 }): React.ReactElement {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [currentOrder, setCurrentOrderState] = useState<OrderEntity | null>(
+    null
+  );
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -123,6 +129,8 @@ export function CartProvider({
         //  updateCustomProduct,
         clearCart,
         getTotalPrice,
+        setCurrentOrder: (e) => setCurrentOrderState(e),
+        currentOrder,
       }}
     >
       {children}

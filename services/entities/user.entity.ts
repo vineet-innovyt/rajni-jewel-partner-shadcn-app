@@ -7,6 +7,7 @@ export class UserEntity {
     displayName?: string;
     tenantCode!: string;
     roles!: UserRolesEnum[];
+    partnerId!: string;
 }
 
 export class ClientAppEntity {

@@ -4,3 +4,4 @@ export { PartnerStatusEnum } from './partner-status.enum';
 export { UnitTypesEnum } from './unit-types.enum';
 export { ProductStatusEnum } from './product-status.enum';
 export { OrderStatusEnum } from './order-status';
+export { OrderStageTypeEnum } from './order-stage-type.enum';

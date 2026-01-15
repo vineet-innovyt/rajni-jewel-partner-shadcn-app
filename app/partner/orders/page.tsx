@@ -2,44 +2,30 @@
 
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Header } from "@/components/header";
 import { ChevronDown, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { Order } from "@/lib/types";
-import { PARTNER_PRODUCTS_PAGE } from "@/lib/constants";
+import { PARTNER_PRODUCTS_PAGE, QUERY_KEYS } from "@/lib/constants";
+import { getPartnerOrderSearchApi } from "@/services/rajni-apis";
+import { useQuery } from "@tanstack/react-query";
 
 export default function OrdersPage() {
-  const { user, isLoading } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
-  const [orders, setOrders] = useState<Order[]>([]);
+
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!isLoading && !user) {
-      router.push("/auth/sign-in");
-    }
-  }, [user, isLoading, router]);
-
-  // Load orders from localStorage
-  useEffect(() => {
-    if (user) {
-      const allOrders = JSON.parse(
-        localStorage.getItem("jewelry_orders") || "[]"
-      );
-      const userOrders = allOrders.filter(
-        (order: any) => order.userId === user.id
-      );
-      setOrders(
-        userOrders.sort(
-          (a: any, b: any) =>
-            new Date(b.date).getTime() - new Date(a.date).getTime()
-        )
-      );
-    }
-  }, [user]);
+  const {
+    data: searchResult,
+    refetch,
+    isLoading,
+  } = useQuery({
+    queryKey: [QUERY_KEYS.Orders],
+    queryFn: () => getPartnerOrderSearchApi(0, 500),
+  });
 
   if (isLoading) {
     return (
@@ -53,7 +39,9 @@ export default function OrdersPage() {
     return null;
   }
 
-  const formatDate = (dateString: string) => {
+  const orders = searchResult?.items || [];
+
+  const formatDate = (dateString: string | Date) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
@@ -65,7 +53,7 @@ export default function OrdersPage() {
     switch (status) {
       case "completed":
         return "bg-green-100 text-green-800";
-      case "processing":
+      case "placed":
         return "bg-blue-100 text-blue-800";
       case "shipped":
         return "bg-purple-100 text-purple-800";
@@ -78,7 +66,7 @@ export default function OrdersPage() {
     switch (status) {
       case "completed":
         return "✓";
-      case "processing":
+      case "placed":
         return "◄";
       case "shipped":
         return "→";
@@ -129,18 +117,19 @@ export default function OrdersPage() {
                     <div className="flex gap-4 items-start md:items-center flex-col md:flex-row">
                       <div>
                         <p className="text-sm text-muted-foreground">
-                          Order #ORD-{order.id}
+                          Order #{order.orderNumber}
                         </p>
                         <h3 className="text-lg font-semibold text-foreground mt-1">
-                          {formatDate(order.date)}
+                          {formatDate(order.createdOn)}
                         </h3>
                       </div>
                       <div
                         className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${getStatusColor(
-                          order.status
+                          order.currentStage.type
                         )}`}
                       >
-                        {getStatusIcon(order.status)} {order.status}
+                        {getStatusIcon(order.currentStage.type)}{" "}
+                        {order.currentStage.type}
                       </div>
                     </div>
                     <p className="text-sm text-muted-foreground mt-2">
@@ -150,10 +139,7 @@ export default function OrdersPage() {
 
                   <div className="text-right flex flex-col items-end gap-2">
                     <p className="text-2xl font-bold text-primary">
-                      $
-                      {order.totalPrice.toLocaleString("en-US", {
-                        maximumFractionDigits: 2,
-                      })}
+                      {order.items?.length} (Products)
                     </p>
                     <ChevronDown
                       size={20}
@@ -237,12 +223,7 @@ export default function OrdersPage() {
                     <div className="bg-card border border-border rounded p-4 space-y-2">
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Subtotal</span>
-                        <span className="text-foreground">
-                          $
-                          {(order.totalPrice * 0.926).toLocaleString("en-US", {
-                            maximumFractionDigits: 2,
-                          })}
-                        </span>
+                        <span className="text-foreground">N/A</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Shipping</span>
@@ -253,10 +234,7 @@ export default function OrdersPage() {
                           Total
                         </span>
                         <span className="text-lg font-bold text-primary">
-                          $
-                          {order.totalPrice.toLocaleString("en-US", {
-                            maximumFractionDigits: 2,
-                          })}
+                          N/A
                         </span>
                       </div>
                     </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { Toaster } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React, { ReactNode } from "react";
 
@@ -21,7 +22,7 @@ export const QueryProvider: React.FC<IQueryProviderProps> = ({ children }) => {
   return (
     <QueryClientProvider client={appQueryClient}>
       {children}
-      {/* <Toaster position="top-center" richColors /> */}
+      <Toaster position="top-center" richColors />
     </QueryClientProvider>
   );
 };

@@ -1,7 +1,7 @@
 
 import { QueryClient } from '@tanstack/react-query';
 import { OrderCreateDto, UserSignInDto } from './dto';
-import { PaginatedResultEntity, ProductEntity, SignInSuccessEntity } from './entities';
+import { OrderEntity, PaginatedResultEntity, ProductEntity, SignInSuccessEntity } from './entities';
 import { UserContextEntity } from './entities/user-context.entity';
 import { AUTH_TOKEN_KEY } from '@/lib/constants';
 
@@ -104,15 +104,24 @@ export const getProductByIdApi = async (id: string): Promise<ProductEntity> => {
 };
 
 export const createOrderApi = async (dto: OrderCreateDto): Promise<OrderEntity> => {
-    const dataUrl = rajniApi + `/api/v1/order`;
+    const dataUrl = rajniApi + `/api/v1/order/partner`;
     const response = await fetch(dataUrl, {
         method: 'POST',
         headers: getHeaders(),
         cache: 'no-store',
-         body: JSON.stringify(dto),
+        body: JSON.stringify(dto),
     });
     if (!response.ok) throw new Error(response.statusText);
     return response.json();
 };
 
+export const getPartnerOrderSearchApi = async (pageIndex?: number, pageSize?: number): Promise<PaginatedResultEntity<OrderEntity>> => {
+    const dataUrl = rajniApi + `/api/v1/order/partner/search?page-index=${pageIndex}&page-size=${pageSize}`;
+    const response = await fetch(dataUrl, {
+        headers: getHeaders(),
+        cache: 'no-store',
+    });
+    if (!response.ok) throw new Error(response.statusText);
+    return response.json();
+};
 

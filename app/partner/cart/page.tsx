@@ -12,7 +12,10 @@ import {
   AddCustomProduct,
   AddCustomProductModal,
 } from "@/components/add-custom-product";
-import { PARTNER_PRODUCTS_PAGE } from "@/lib/constants";
+import {
+  PARTNER_ORDER_SUCCESS_PAGE,
+  PARTNER_PRODUCTS_PAGE,
+} from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -25,11 +28,22 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { sumBy } from "lodash-es";
+import { createOrderApi } from "@/services/rajni-apis";
+import { convertCartToCreateOrderDto } from "@/lib/helpers";
+import { toast } from "sonner";
 
 export default function CartPage() {
   const { user, isLoading } = useAuth();
-  const { items, addToCart, removeFromCart, updateQuantity, getTotalPrice } =
-    useCart();
+  const {
+    items,
+    addToCart,
+    removeFromCart,
+    updateQuantity,
+    getTotalPrice,
+    setCurrentOrder,
+    clearCart,
+  } = useCart();
   const router = useRouter();
   const [editProductId, seteEditProductId] = useState<string>("");
   const [isOrderPlacing, setIsOrderPlacing] = useState(false);
@@ -59,7 +73,14 @@ export default function CartPage() {
   const onPlaceOrder = async () => {
     try {
       setIsOrderPlacing(true);
+      const dto = convertCartToCreateOrderDto(user.partnerId, items);
+      const orderEntity = await createOrderApi(dto);
+      setCurrentOrder(orderEntity);
+      toast.success(`Order palced successfully`);
+      router.push(PARTNER_ORDER_SUCCESS_PAGE);
+      clearCart();
     } catch (ex) {
+      toast.error("failed to place order");
       console.error("failed onPlaceOrder", ex);
     }
     setIsOrderPlacing(false);
@@ -214,9 +235,13 @@ export default function CartPage() {
 
                 <div className="space-y-3 border-b border-border pb-4">
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Subtotal</span>
+                    <span className="text-muted-foreground">Products</span>
+                    <span className="text-foreground">{items.length}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Total Qty</span>
                     <span className="text-foreground">
-                      ${subtotal.toLocaleString()}
+                      {sumBy(items, (o) => o.quantity)}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
@@ -225,52 +250,46 @@ export default function CartPage() {
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Tax (8%)</span>
-                    <span className="text-foreground">
-                      $
-                      {tax.toLocaleString("en-US", {
-                        maximumFractionDigits: 2,
-                      })}
-                    </span>
+                    <span className="text-foreground">N/A</span>
                   </div>
                 </div>
 
                 <div className="flex justify-between">
                   <span className="font-bold text-foreground">Total</span>
-                  <span className="text-2xl font-bold text-primary">
-                    $
-                    {total.toLocaleString("en-US", {
-                      maximumFractionDigits: 2,
-                    })}
-                  </span>
+                  <span className="text-2xl font-bold text-primary">N/A</span>
                 </div>
 
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      disabled={isOrderPlacing}
-                      className="  w-full flex flex-row bg-primary text-primary-foreground py-3 rounded-lg hover:opacity-90 transition font-medium text-center  disabled:text-black disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-200"
-                    >
-                      {isOrderPlacing && (
-                        <Loader className="w-5 h-5 animate-spin" />
-                      )}
-                      Place Order
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Confirm</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Click confirm to place your order.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={onPlaceOrder}>
-                        Confirm
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                {Boolean(items?.length) && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        disabled={isOrderPlacing}
+                        className="  w-full flex flex-row bg-primary text-primary-foreground py-3 rounded-lg hover:opacity-90 transition font-medium text-center  disabled:text-black disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-200"
+                      >
+                        {isOrderPlacing && (
+                          <Loader className="w-5 h-5 animate-spin" />
+                        )}
+                        Place Order
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Place Order?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Click confirm to place your order.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel onClick={(e) => clearCart()}>
+                          Cancel
+                        </AlertDialogCancel>
+                        <AlertDialogAction onClick={onPlaceOrder}>
+                          Confirm
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
 
                 <Link
                   href={PARTNER_PRODUCTS_PAGE}

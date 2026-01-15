@@ -10,3 +10,4 @@ export { AssetItemEntity } from "./asset-item.entity";
 export { ClientAppEntity } from "./user.entity";
 export { OrderLineItemEntity } from "./order-line-item";
 export { PartnerEntity, PartnerSettingEntity } from "./partner.entity";
+export { OrderEntity } from "./order.entity";
