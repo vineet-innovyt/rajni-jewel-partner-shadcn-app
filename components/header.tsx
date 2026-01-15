@@ -41,6 +41,12 @@ export function Header() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex gap-6 items-center">
             <Link
+              href={PARTNER_HOME_PAGE}
+              className="text-foreground hover:text-primary transition text-sm font-medium"
+            >
+              Home
+            </Link>
+            <Link
               href={PARTNER_PRODUCTS_PAGE}
               className="text-foreground hover:text-primary transition text-sm font-medium"
             >
@@ -93,16 +99,22 @@ export function Header() {
         {mobileMenuOpen && (
           <div className="md:hidden mt-4 space-y-3 pb-4">
             <Link
+              href={PARTNER_HOME_PAGE}
+              className="text-foreground hover:text-primary transition text-sm font-medium  pt-2"
+            >
+              Home
+            </Link>
+            <Link
               href={PARTNER_PRODUCTS_PAGE}
-              className="block text-foreground hover:text-primary transition text-sm font-medium py-2"
+              className="block text-foreground hover:text-primary transition text-sm font-medium pt-2"
             >
               Shop All
             </Link>
             <Link
               href={PARTNER_CART_PAGE}
-              className="flex items-center gap-2 text-foreground hover:text-primary transition text-sm font-medium py-2 relative"
+              className="flex items-center gap-2 text-foreground hover:text-primary transition text-sm font-medium relative "
             >
-              <ShoppingCart size={18} />
+              {/* <ShoppingCart size={18} /> */}
               Cart
               {cartItemCount > 0 && (
                 <span className="bg-primary text-primary-foreground text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
@@ -112,7 +124,7 @@ export function Header() {
             </Link>
             <Link
               href={PARTNER_ORDERS_PAGE}
-              className="block text-foreground hover:text-primary transition text-sm font-medium py-2"
+              className="block text-foreground hover:text-primary transition text-sm font-medium "
             >
               Orders
             </Link>

@@ -1,16 +1,17 @@
-"use client"
+"use client";
 
-import Image from "next/image"
-import Link from "next/link"
+import { PARTNER_PRODUCTS_PAGE } from "@/lib/constants";
+import Image from "next/image";
+import Link from "next/link";
 
 export interface Category {
-  id: string
-  name: string
-  image: string
+  id: string;
+  name: string;
+  image: string;
 }
 
 interface CategoryTilesProps {
-  categories: Category[]
+  categories: Category[];
 }
 
 export function CategoryTiles({ categories }: CategoryTilesProps) {
@@ -24,7 +25,7 @@ export function CategoryTiles({ categories }: CategoryTilesProps) {
         {categories.map((category) => (
           <Link
             key={category.id}
-            href={`/products?category=${category.id}`}
+            href={`${PARTNER_PRODUCTS_PAGE}?category=${category.id}`}
             className="group relative overflow-hidden rounded-lg border border-border hover:border-primary transition"
           >
             <div className="aspect-square relative">
@@ -35,12 +36,14 @@ export function CategoryTiles({ categories }: CategoryTilesProps) {
                 className="object-cover group-hover:scale-110 transition duration-500"
               />
               <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition flex items-center justify-center">
-                <h3 className="text-2xl font-bold text-white text-center">{category.name}</h3>
+                <h3 className="text-2xl font-bold text-white text-center">
+                  {category.name}
+                </h3>
               </div>
             </div>
           </Link>
         ))}
       </div>
     </section>
-  )
+  );
 }
