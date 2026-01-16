@@ -5,7 +5,6 @@ import type React from "react";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -15,6 +14,7 @@ export default function SignInPage() {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showForgotForm, setShowForgotForm] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -39,9 +39,9 @@ export default function SignInPage() {
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-primary mb-2">Jewel</h1>
+          <h1 className="text-3xl font-bold text-primary mb-2">Rajni Jewel</h1>
           <h2 className="text-xl font-semibold text-foreground">
-            Welcome Back
+            Partner Portal
           </h2>
           <p className="text-muted-foreground mt-2">Sign in to your account</p>
         </div>
@@ -84,14 +84,20 @@ export default function SignInPage() {
               required
               disabled={isLoading}
             />
+            {/* <span
+              onClick={() => setShowForgotForm(true)}
+              className="text-sm cursor-pointer text-primary hover:underline"
+            >
+              Forgot password?
+            </span> */}
           </div>
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          <Button type="submit" className="w-full mt-2" disabled={isLoading}>
             {isLoading ? "Signing In..." : "Sign In"}
           </Button>
         </form>
 
-        <p className="text-center text-muted-foreground mt-4">
+        {/* <p className="text-center text-muted-foreground mt-4">
           Don't have an account?{" "}
           <Link
             href="/auth/sign-up"
@@ -99,8 +105,9 @@ export default function SignInPage() {
           >
             Sign Up
           </Link>
-        </p>
+        </p> */}
       </div>
+      {/* <ForgotPasswordForm /> */}
     </div>
   );
 }

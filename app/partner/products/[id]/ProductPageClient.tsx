@@ -1,12 +1,14 @@
 "use client";
 
-import { Minus, Plus, Share2, ShoppingCart } from "lucide-react";
+import { ArrowLeft, Minus, Plus, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/header";
 import { useCart } from "@/lib/cart-context";
 import { ProductEntity } from "@/services/entities";
 import { ProductGallery } from "@/components/product-gallery";
 import { IProductMetadata } from "@/lib/types";
+import Link from "next/link";
+import { PARTNER_PRODUCTS_PAGE } from "@/lib/constants";
 
 interface ProductPageClientProps {
   product: ProductEntity;
@@ -31,7 +33,13 @@ export function ProductPageClient({ product }: ProductPageClientProps) {
   };
 
   const handleAddToCart = () => {
-    addToCart(product);
+    addToCart({
+      lineItemId: Date.now().toString(),
+      productId: product.id as string,
+      product,
+      quantity: 1,
+      isCustomProduct: false,
+    });
   };
 
   const images = (product.images || []).map(
@@ -39,6 +47,18 @@ export function ProductPageClient({ product }: ProductPageClientProps) {
   );
 
   const productMetadata: IProductMetadata = product.metadata || {};
+
+  const backButton = () => (
+    <Link
+      href={PARTNER_PRODUCTS_PAGE}
+      className="shrink-0 flex hover:text-primary"
+    >
+      <ArrowLeft className="h-4 w-4 m-1" />
+      Back to products
+    </Link>
+  );
+
+  const inStock = Boolean(product?.id);
 
   return (
     <>
@@ -55,6 +75,7 @@ export function ProductPageClient({ product }: ProductPageClientProps) {
             {/* Product Info */}
             <div className="space-y-6">
               <div>
+                {backButton()}
                 <h1 className="text-4xl font-bold text-foreground mb-2">
                   {product.name}
                 </h1>
@@ -66,15 +87,12 @@ export function ProductPageClient({ product }: ProductPageClientProps) {
               {/* Price and Availability */}
               <div className="border-t border-b border-border py-4 space-y-3">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-primary">${0}</span>
                   <span
                     className={`text-sm font-semibold ${
-                      product.metadata?.inStock
-                        ? "text-green-600"
-                        : "text-red-600"
+                      inStock ? "text-green-600" : "text-red-600"
                     }`}
                   >
-                    {product.metadata?.inStock ? "In Stock" : "Out of Stock"}
+                    {inStock ? "In Stock" : "Out of Stock"}
                   </span>
                 </div>
               </div>
@@ -94,11 +112,11 @@ export function ProductPageClient({ product }: ProductPageClientProps) {
               )}
 
               {/* Actions */}
-              <div className="flex gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 {quantity > 0 ? (
                   <div className="flex items-center gap-2 flex-1">
                     <Button
-                      onClick={handleIncrement}
+                      onClick={handleDecrement}
                       variant="outline"
                       size="lg"
                       className="px-4 bg-transparent"
@@ -120,7 +138,7 @@ export function ProductPageClient({ product }: ProductPageClientProps) {
                 ) : (
                   <Button
                     onClick={handleAddToCart}
-                    disabled={!product.metadata?.inStock}
+                    disabled={!inStock}
                     size="lg"
                     className="flex-1 gap-2"
                   >
@@ -128,14 +146,15 @@ export function ProductPageClient({ product }: ProductPageClientProps) {
                     <span>Add to Cart</span>
                   </Button>
                 )}
-                <Button
+                <div>&nbsp;</div>
+                {/* <Button
                   variant="outline"
                   size="lg"
                   className="flex-1 bg-transparent"
                 >
                   <Share2 size={18} />
                   Share
-                </Button>
+                </Button> */}
               </div>
 
               {/* Quick Specs */}
@@ -167,7 +186,7 @@ export function ProductPageClient({ product }: ProductPageClientProps) {
           {/* Detailed Specifications */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {/* Metal Information */}
-            <div className="border border-border rounded-lg p-6 space-y-4">
+            <div className="border border-border rounded-lg p-6 space-y-4 bg-orange-50">
               <h3 className="text-lg font-semibold text-foreground">
                 Metal Information
               </h3>
@@ -201,7 +220,7 @@ export function ProductPageClient({ product }: ProductPageClientProps) {
             </div>
 
             {/* Weight Information */}
-            <div className="border border-border rounded-lg p-6 space-y-4">
+            <div className="border border-border rounded-lg p-6 space-y-4 bg-orange-50">
               <h3 className="text-lg font-semibold text-foreground">
                 Weight Specifications
               </h3>
@@ -230,7 +249,7 @@ export function ProductPageClient({ product }: ProductPageClientProps) {
             </div>
 
             {/* Stone Information */}
-            <div className="border border-border rounded-lg p-6 space-y-4">
+            <div className="border border-border rounded-lg p-6 space-y-4 bg-orange-50">
               <h3 className="text-lg font-semibold text-foreground">
                 Stone Information
               </h3>
@@ -250,14 +269,14 @@ export function ProductPageClient({ product }: ProductPageClientProps) {
                 <div>
                   <span className="text-muted-foreground">Product Type:</span>
                   <p className="font-medium text-foreground capitalize">
-                    {product.type?.name}
+                    {product.type?.value}
                   </p>
                 </div>
               </div>
             </div>
 
             {/* Category Information */}
-            <div className="border border-border rounded-lg p-6 space-y-4">
+            <div className="border border-border rounded-lg p-6 space-y-4 bg-orange-50">
               <h3 className="text-lg font-semibold text-foreground">
                 Category Information
               </h3>
@@ -265,7 +284,7 @@ export function ProductPageClient({ product }: ProductPageClientProps) {
                 <div>
                   <span className="text-muted-foreground">Category:</span>
                   <p className="font-medium text-foreground capitalize">
-                    {product.categories?.[0]?.name}
+                    {product.categories?.[0]?.value}
                   </p>
                 </div>
 
@@ -279,7 +298,7 @@ export function ProductPageClient({ product }: ProductPageClientProps) {
             </div>
 
             {/* Additional Details */}
-            <div className="border border-border rounded-lg p-6 space-y-4">
+            <div className="border border-border rounded-lg p-6 space-y-4 bg-orange-50">
               <h3 className="text-lg font-semibold text-foreground">
                 Additional Details
               </h3>
@@ -303,7 +322,7 @@ export function ProductPageClient({ product }: ProductPageClientProps) {
             </div>
 
             {/* Value Summary */}
-            <div className="border border-border rounded-lg p-6 space-y-4">
+            <div className="border border-border rounded-lg p-6 space-y-4 bg-orange-50">
               <h3 className="text-lg font-semibold text-foreground">
                 Value Breakdown
               </h3>
