@@ -32,13 +32,6 @@ export function ProductFilters({
     type: true,
   });
 
-  const subcategories: Record<string, string[]> = {
-    rings: ["gold", "diamond", "gemstone"],
-    necklaces: ["gold", "pearl", "diamond"],
-    bracelets: ["gold", "pearl", "tennis"],
-    earrings: ["stud", "drop", "hoop"],
-  };
-
   const types = sortBy(
     uniqBy(
       products.filter((o) => o.type).map((o) => o.type as CodeItemEntity),
