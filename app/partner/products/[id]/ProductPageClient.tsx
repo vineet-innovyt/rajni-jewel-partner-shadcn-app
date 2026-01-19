@@ -43,7 +43,7 @@ export function ProductPageClient({ product }: ProductPageClientProps) {
   };
 
   const images = (product.images || []).map(
-    (image) => image.url || "/placeholder.svg"
+    (image) => image.url || "/placeholder.svg",
   );
 
   const productMetadata: IProductMetadata = product.metadata || {};
@@ -160,22 +160,33 @@ export function ProductPageClient({ product }: ProductPageClientProps) {
               {/* Quick Specs */}
               <div className="bg-secondary rounded-lg p-4 space-y-3">
                 <h3 className="font-semibold text-foreground">Quick Details</h3>
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <span className="text-muted-foreground">Product Code:</span>
-                  <span className="font-medium">{product.code}</span>
+                <div className="grid grid-cols-3 gap-3 text-sm">
+                  <span className="text-muted-foreground col-span-1">SKU:</span>
+                  <span className="font-medium col-span-2">{product.sku}</span>
 
-                  <span className="text-muted-foreground">Design Number:</span>
-                  <span className="font-medium">
+                  <span className="text-muted-foreground col-span-1">
+                    Product Code:
+                  </span>
+                  <span className="font-medium col-span-2">{product.code}</span>
+
+                  <span className="text-muted-foreground col-span-1">
+                    Design Number:
+                  </span>
+                  <span className="font-medium col-span-2">
                     {productMetadata.metalColor as string}
                   </span>
 
-                  <span className="text-muted-foreground">Shape:</span>
-                  <span className="font-medium">
+                  <span className="text-muted-foreground col-span-1">
+                    Shape:
+                  </span>
+                  <span className="font-medium col-span-2">
                     {productMetadata.metalColor as string}
                   </span>
 
-                  <span className="text-muted-foreground">Color:</span>
-                  <span className="font-medium">
+                  <span className="text-muted-foreground col-span-1">
+                    Color:
+                  </span>
+                  <span className="font-medium col-span-2">
                     {productMetadata.metalColor as string}
                   </span>
                 </div>
@@ -213,8 +224,8 @@ export function ProductPageClient({ product }: ProductPageClientProps) {
                 </div>
 
                 <div className="border-t border-border pt-3 mt-3">
-                  <span className="text-muted-foreground">Metal Value:</span>
-                  <p className="font-bold text-primary">${0}</p>
+                  <span className="text-muted-foreground">Gold Weight:</span>
+                  <p className="font-bold text-primary">{"-"}</p>
                 </div>
               </div>
             </div>
@@ -228,14 +239,14 @@ export function ProductPageClient({ product }: ProductPageClientProps) {
                 <div>
                   <span className="text-muted-foreground">Gross Weight:</span>
                   <p className="font-medium text-foreground">
-                    {productMetadata.stoneWeightGm}g
+                    {productMetadata.stoneWeightGm}
                   </p>
                 </div>
 
                 <div>
                   <span className="text-muted-foreground">Net Weight:</span>
                   <p className="font-medium text-foreground">
-                    {productMetadata.stoneWeightGm}g
+                    {productMetadata.stoneWeightGm}
                   </p>
                 </div>
 
@@ -243,7 +254,7 @@ export function ProductPageClient({ product }: ProductPageClientProps) {
                   <span className="text-muted-foreground">
                     Available Sizes:
                   </span>
-                  <p className="font-medium text-foreground">{1}</p>
+                  <p className="font-medium text-foreground">{"-"}</p>
                 </div>
               </div>
             </div>
@@ -256,14 +267,12 @@ export function ProductPageClient({ product }: ProductPageClientProps) {
               <div className="space-y-3 text-sm">
                 <div>
                   <span className="text-muted-foreground">Shape:</span>
-                  <p className="font-medium text-foreground">
-                    {"product.shape"}
-                  </p>
+                  <p className="font-medium text-foreground">-</p>
                 </div>
 
                 <div>
                   <span className="text-muted-foreground">Stone Value:</span>
-                  <p className="font-bold text-primary">${1}</p>
+                  <p className="font-bold text-primary">-</p>
                 </div>
 
                 <div>
@@ -289,9 +298,9 @@ export function ProductPageClient({ product }: ProductPageClientProps) {
                 </div>
 
                 <div>
-                  <span className="text-muted-foreground">Subcategory:</span>
+                  <span className="text-muted-foreground">Collection:</span>
                   <p className="font-medium text-foreground capitalize">
-                    {"product.subcategory"}
+                    {product.collections?.[0]?.value}
                   </p>
                 </div>
               </div>
@@ -329,21 +338,19 @@ export function ProductPageClient({ product }: ProductPageClientProps) {
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Metal Value:</span>
-                  <span className="font-medium text-foreground">${1}</span>
+                  <span className="font-medium text-foreground">-</span>
                 </div>
 
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Stone Value:</span>
-                  <span className="font-medium text-foreground">${1}</span>
+                  <span className="font-medium text-foreground">-</span>
                 </div>
 
                 <div className="border-t border-border pt-3 mt-3 flex justify-between">
                   <span className="font-semibold text-foreground">
                     Item Total:
                   </span>
-                  <span className="font-bold text-primary">
-                    ${(1).toLocaleString()}
-                  </span>
+                  <span className="font-bold text-primary">-</span>
                 </div>
               </div>
             </div>
