@@ -28,7 +28,7 @@ const validationSchema = Yup.object({
     .max(250, "Product name must be less than 250 characters"),
   description: Yup.string().max(
     2000,
-    "Description must be less than 2000 characters"
+    "Description must be less than 2000 characters",
   ),
   quantity: Yup.number()
     .min(1, "Quantity must be at least 1")
@@ -152,10 +152,10 @@ export const CustomProductForm = ({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="unitType">Unit*</Label>
+              <Label htmlFor="unitType">Unit* (kg, gram, ounce)</Label>
               <SelectOrEnterInput
                 options={unitTypeOptions}
-                initialValue={values.productType}
+                initialValue={values.unitType}
                 onChange={(e) => setFieldValue("unitType", e)}
               />
               <ErrorMessage
@@ -166,23 +166,25 @@ export const CustomProductForm = ({
             </div>
             <div className="space-y-2">
               <Label htmlFor="quantity">Quantity*</Label>
-              <Field
-                as={Input}
-                id="quantity"
-                name="quantity"
-                type="number"
-                placeholder="Enter quantity"
-                className={
-                  "w-25" +
-                  (errors.quantity && touched.quantity
-                    ? "border-destructive"
-                    : "")
-                }
-              />
+              <div className="w-30">
+                <Field
+                  as={Input}
+                  id="quantity"
+                  name="quantity"
+                  type="number"
+                  placeholder="Enter quantity"
+                  className={
+                    "" +
+                    (errors.quantity && touched.quantity
+                      ? "border-destructive"
+                      : "")
+                  }
+                />
+              </div>
               <ErrorMessage
                 name="quantity"
                 component="p"
-                className="text-sm text-destructive"
+                className="text-sm text-destructive w-25"
               />
             </div>
             <div className="space-y-2">

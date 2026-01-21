@@ -36,6 +36,8 @@ export function ProductCarousel({ products, title }: ProductCarouselProps) {
     setAutoPlay(false);
   };
 
+  if (!products?.length) return;
+
   const product = products[currentIndex];
 
   return (
@@ -51,11 +53,7 @@ export function ProductCarousel({ products, title }: ProductCarouselProps) {
       >
         <div className="aspect-square md:aspect-video relative">
           <Image
-            src={
-              product.featureImage ||
-              product.images?.[0]?.url ||
-              "/placeholder.svg"
-            }
+            src={product.images?.[0]?.url || "/placeholder.svg"}
             alt={product.name as string}
             fill
             className="object-cover"

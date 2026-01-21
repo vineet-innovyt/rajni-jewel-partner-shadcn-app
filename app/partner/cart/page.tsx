@@ -100,12 +100,18 @@ export default function CartPage() {
               <ShoppingCart size={48} className="mx-auto mb-4 opacity-50" />
               <p className="text-lg">Your cart is empty</p>
             </div>
-            <Link
-              href={PARTNER_PRODUCTS_PAGE}
-              className="inline-block bg-primary text-primary-foreground px-8 py-3 rounded-lg hover:opacity-90 transition font-medium"
-            >
-              Continue Shopping
-            </Link>
+            <div className="flex flex-col gap-3  items-center w-full">
+              <Link
+                href={PARTNER_PRODUCTS_PAGE}
+                className="inline-block bg-primary text-primary-foreground px-8 w-70 py-3 rounded-lg hover:opacity-90 transition font-medium"
+              >
+                Continue Shopping
+              </Link>
+              <div className="w-70">OR</div>
+              <div className="w-70">
+                <AddCustomProduct />
+              </div>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -165,7 +171,7 @@ export default function CartPage() {
                         {isCustom && (
                           <div className="flex flex-row gap-2">
                             <p className="text-sm text-muted-foreground mt-1">
-                              Custom Product
+                              {`${item.quantity} ${item.unitType}`}
                             </p>
                             <button
                               onClick={() => seteEditProductId(item.product.id)}
