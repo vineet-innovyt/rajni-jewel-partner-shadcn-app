@@ -81,7 +81,8 @@ export function ProductsContent() {
         if (
           !product.name?.toLowerCase().includes(query) &&
           !product.description?.toLowerCase().includes(query) &&
-          !product.tags?.join(" ")?.toLowerCase().includes(query)
+          !product.tags?.join(" ")?.toLowerCase().includes(query) &&
+          !product.sku?.toLowerCase().includes(query)
         ) {
           return false;
         }
