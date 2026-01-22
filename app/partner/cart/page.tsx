@@ -32,6 +32,7 @@ import { sumBy } from "lodash-es";
 import { createOrderApi } from "@/services/rajni-apis";
 import { convertCartToCreateOrderDto } from "@/lib/helpers";
 import { toast } from "sonner";
+import Footer from "@/components/footer";
 
 export default function CartPage() {
   const { user, isLoading } = useAuth();
@@ -100,12 +101,18 @@ export default function CartPage() {
               <ShoppingCart size={48} className="mx-auto mb-4 opacity-50" />
               <p className="text-lg">Your cart is empty</p>
             </div>
-            <Link
-              href={PARTNER_PRODUCTS_PAGE}
-              className="inline-block bg-primary text-primary-foreground px-8 py-3 rounded-lg hover:opacity-90 transition font-medium"
-            >
-              Continue Shopping
-            </Link>
+            <div className="flex flex-col gap-3  items-center w-full">
+              <Link
+                href={PARTNER_PRODUCTS_PAGE}
+                className="inline-block bg-primary text-primary-foreground px-8 w-70 py-3 rounded-lg hover:opacity-90 transition font-medium"
+              >
+                Continue Shopping
+              </Link>
+              <div className="w-70">OR</div>
+              <div className="w-70">
+                <AddCustomProduct />
+              </div>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -165,7 +172,7 @@ export default function CartPage() {
                         {isCustom && (
                           <div className="flex flex-row gap-2">
                             <p className="text-sm text-muted-foreground mt-1">
-                              Custom Product
+                              {`${item.quantity} ${item.unitType}`}
                             </p>
                             <button
                               onClick={() => seteEditProductId(item.product.id)}
@@ -303,27 +310,7 @@ export default function CartPage() {
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-border bg-card mt-16">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex justify-between items-center">
-            <p className="text-muted-foreground text-sm">
-              © 2025 Rajni Jewel. All rights reserved.
-            </p>
-            <div className="flex gap-4 text-sm text-muted-foreground">
-              <Link href="#" className="hover:text-primary transition">
-                Privacy
-              </Link>
-              <Link href="#" className="hover:text-primary transition">
-                Terms
-              </Link>
-              <Link href="#" className="hover:text-primary transition">
-                Contact
-              </Link>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

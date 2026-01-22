@@ -11,6 +11,9 @@ export class OrderLineItemDto {
     productId!: string;
     variantId?: string;
     isCustomProduct?: boolean;
+    customProductName?: string;
+    customProductDescription?: string;
+    customProductType?: string;
     remark?: string;
     unitType?: string;
     quantity!: number;
