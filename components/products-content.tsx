@@ -44,7 +44,7 @@ export function ProductsContent() {
       let categoryId = "";
       for (const product of products) {
         const match = product.categories?.find((c) =>
-          c.value?.toLowerCase().includes(qsCategory)
+          c.value?.toLowerCase().includes(qsCategory),
         );
         if (match) {
           categoryId = match.code as string;
@@ -80,7 +80,8 @@ export function ProductsContent() {
         const query = filters.searchQuery.toLowerCase();
         if (
           !product.name?.toLowerCase().includes(query) &&
-          !product.description?.toLowerCase().includes(query)
+          !product.description?.toLowerCase().includes(query) &&
+          !product.tags?.join(" ")?.toLowerCase().includes(query)
         ) {
           return false;
         }

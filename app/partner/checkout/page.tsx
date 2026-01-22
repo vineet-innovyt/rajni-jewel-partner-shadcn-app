@@ -12,6 +12,7 @@ import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PARTNER_PRODUCTS_PAGE } from "@/lib/constants";
+import Footer from "@/components/footer";
 
 interface ShippingInfo {
   firstName: string;
@@ -77,7 +78,7 @@ export default function CheckoutPage() {
   const total = subtotal + tax + shipping;
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     setShippingInfo((prev) => ({
@@ -507,27 +508,7 @@ export default function CheckoutPage() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-border bg-card mt-16">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex justify-between items-center">
-            <p className="text-muted-foreground text-sm">
-              © 2025 Rajni Jewel. All rights reserved.
-            </p>
-            <div className="flex gap-4 text-sm text-muted-foreground">
-              <Link href="#" className="hover:text-primary transition">
-                Privacy
-              </Link>
-              <Link href="#" className="hover:text-primary transition">
-                Terms
-              </Link>
-              <Link href="#" className="hover:text-primary transition">
-                Contact
-              </Link>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
