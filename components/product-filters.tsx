@@ -35,9 +35,9 @@ export function ProductFilters({
   const types = sortBy(
     uniqBy(
       products.filter((o) => o.type).map((o) => o.type as CodeItemEntity),
-      (o) => o.code || ""
+      (o) => o.code || "",
     ),
-    (o) => o.value as string
+    (o) => o.value as string,
   );
 
   const handleCategoryChange = (categoryId: string) => {
@@ -86,9 +86,9 @@ export function ProductFilters({
   const categories = sortBy(
     uniqBy(
       flatMap(products.map((o) => o.categories || [])),
-      (o) => o.code || ""
+      (o) => o.code || "",
     ),
-    (o) => o.value as string
+    (o) => o.value as string,
   );
 
   return (
@@ -111,46 +111,46 @@ export function ProductFilters({
           className="w-full"
         />
       </div>
+      <div className=" max-h-150 overflow-y-scroll [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        {/* Category Filter */}
+        <div className="border-t border-border pt-4">
+          <button
+            onClick={() => toggleSection("category")}
+            className="flex justify-between items-center w-full text-sm font-semibold text-foreground hover:text-primary transition mb-3"
+          >
+            Category
+            <ChevronDown
+              size={16}
+              className={`transition ${
+                expandedSections.category ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+          {expandedSections.category && (
+            <div className="space-y-2 ">
+              {categories.map((cat) => (
+                <label
+                  key={cat.code}
+                  className="flex items-center gap-2 cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    name="category"
+                    checked={filters.categoryIds.includes(cat.code as string)}
+                    onChange={() => handleCategoryChange(cat.code as string)}
+                    className="w-4 h-4"
+                  />
+                  <span className="text-sm text-muted-foreground">
+                    {cat.value}
+                  </span>
+                </label>
+              ))}
+            </div>
+          )}
+        </div>
 
-      {/* Category Filter */}
-      <div className="border-t border-border pt-4">
-        <button
-          onClick={() => toggleSection("category")}
-          className="flex justify-between items-center w-full text-sm font-semibold text-foreground hover:text-primary transition mb-3"
-        >
-          Category
-          <ChevronDown
-            size={16}
-            className={`transition ${
-              expandedSections.category ? "rotate-180" : ""
-            }`}
-          />
-        </button>
-        {expandedSections.category && (
-          <div className="space-y-2">
-            {categories.map((cat) => (
-              <label
-                key={cat.code}
-                className="flex items-center gap-2 cursor-pointer"
-              >
-                <input
-                  type="checkbox"
-                  name="category"
-                  checked={filters.categoryIds.includes(cat.code as string)}
-                  onChange={() => handleCategoryChange(cat.code as string)}
-                  className="w-4 h-4"
-                />
-                <span className="text-sm text-muted-foreground">
-                  {cat.value}
-                </span>
-              </label>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Subcategory Filter */}
-      {/* {filters.categoryIds && (
+        {/* Subcategory Filter */}
+        {/* {filters.categoryIds && (
         <div className="border-t border-border pt-4">
           <label className="block text-sm font-semibold text-foreground mb-3">
             Material/Type
@@ -176,42 +176,42 @@ export function ProductFilters({
         </div>
       )} */}
 
-      {/* Product Type Filter */}
-      <div className="border-t border-border pt-4">
-        <button
-          onClick={() => toggleSection("type")}
-          className="flex justify-between items-center w-full text-sm font-semibold text-foreground hover:text-primary transition mb-3"
-        >
-          Product Type
-          <ChevronDown
-            size={16}
-            className={`transition ${
-              expandedSections.type ? "rotate-180" : ""
-            }`}
-          />
-        </button>
-        {expandedSections.type && (
-          <div className="space-y-2">
-            {types.map((type) => (
-              <label
-                key={type.code}
-                className="flex items-center gap-2 cursor-pointer"
-              >
-                <input
-                  type="checkbox"
-                  checked={filters.typeIds.includes(type.code as string)}
-                  onChange={() => handleTypeChange(type.code as string)}
-                  className="w-4 h-4"
-                />
-                <span className="text-sm text-muted-foreground capitalize">
-                  {type.value}
-                </span>
-              </label>
-            ))}
-          </div>
-        )}
+        {/* Product Type Filter */}
+        <div className="border-t border-border pt-4">
+          <button
+            onClick={() => toggleSection("type")}
+            className="flex justify-between items-center w-full text-sm font-semibold text-foreground hover:text-primary transition mb-3"
+          >
+            Product Type
+            <ChevronDown
+              size={16}
+              className={`transition ${
+                expandedSections.type ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+          {expandedSections.type && (
+            <div className="space-y-2 ">
+              {types.map((type) => (
+                <label
+                  key={type.code}
+                  className="flex items-center gap-2 cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    checked={filters.typeIds.includes(type.code as string)}
+                    onChange={() => handleTypeChange(type.code as string)}
+                    className="w-4 h-4"
+                  />
+                  <span className="text-sm text-muted-foreground capitalize">
+                    {type.value}
+                  </span>
+                </label>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-
       {/* Reset Filters */}
       <Button
         variant="outline"
