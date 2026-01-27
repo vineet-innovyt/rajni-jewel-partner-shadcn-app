@@ -16,6 +16,10 @@ import { useReactToPrint } from "react-to-print";
 import { useRef } from "react";
 import { format } from "date-fns";
 import Footer from "@/components/footer";
+import {
+  getOrderStatusColor,
+  getOrderStatusLabel,
+} from "@/lib/helpers/get-status-color";
 
 const getStatusIcon = (status: string) => {
   switch (status) {
@@ -143,11 +147,11 @@ const OrderBlock = ({ order }: { order: OrderEntity }) => {
               </h3>
             </div>
             <div
-              className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${getStatusColor(
+              className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${getOrderStatusColor(
                 order.currentStage.type,
               )}`}
             >
-              {getStatusIcon(order.currentStage.type)} {order.currentStage.type}
+              {getOrderStatusLabel(order.currentStage.type)}
             </div>
           </div>
           <p className="text-sm text-muted-foreground mt-2">
