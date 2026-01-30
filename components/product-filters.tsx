@@ -140,7 +140,7 @@ export function ProductFilters({
                     onChange={() => handleCategoryChange(cat.code as string)}
                     className="w-4 h-4"
                   />
-                  <span className="text-sm text-muted-foreground">
+                  <span className="text-sm text-muted-foreground uppercase">
                     {cat.value}
                   </span>
                 </label>
