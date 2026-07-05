@@ -1,5 +1,6 @@
 import * as Yup from "yup";
 import {
+  AssetItemEntity,
   CodeItemEntity,
   OrderLineItemEntity,
   ProductEntity,
@@ -12,6 +13,7 @@ import { Textarea } from "./ui/textarea";
 import { DialogFooter } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { CartItem } from "@/lib/types";
+import ImageUpload, { UploadedImage } from "./image-upload";
 
 interface ICustomProductFormProps {
   cartItem?: CartItem;
@@ -20,6 +22,8 @@ interface ICustomProductFormProps {
   productTypeOptions?: CodeItemEntity[];
   unitTypeOptions?: CodeItemEntity[];
 }
+
+const FIELD_BORDER_CLASS = "border border-muted-foreground/40";
 
 const validationSchema = Yup.object({
   productName: Yup.string()
@@ -37,9 +41,30 @@ const validationSchema = Yup.object({
   unitType: Yup.string()
     .required("Unit is required")
     .max(250, "Unit must be less than 250 characters"),
+  dimensions: Yup.string()
+    .optional()
+    .max(250, "Dimensions must be less than 250 characters"),
   productType: Yup.string()
     .optional()
     .max(250, "Product type must be less than 250 characters"),
+});
+
+const mapAssetToUploadedImage = (
+  attachment: AssetItemEntity,
+  index: number,
+): UploadedImage => ({
+  name: attachment.name || `Image ${index + 1}`,
+  size: Number(attachment.metadata?.size || 0),
+  base64: attachment.url || "",
+});
+
+const mapUploadedImageToAsset = (image: UploadedImage): AssetItemEntity => ({
+  type: "image",
+  name: image.name,
+  url: image.base64,
+  metadata: {
+    size: image.size,
+  },
 });
 
 export const CustomProductForm = ({
@@ -59,6 +84,8 @@ export const CustomProductForm = ({
     description: product?.description || "",
     productType: product?.type?.value || "",
     unitType: orderLineItem?.unitType || "",
+    dimensions: orderLineItem?.dimensions || "",
+    imageAttachments: orderLineItem?.imageAttachments || product?.images || [],
     remark: orderLineItem?.remark || "",
     quantity: orderLineItem?.quantity || 0,
   };
@@ -75,10 +102,13 @@ export const CustomProductForm = ({
       sku: "",
       tenantCode: "",
       createdOn: new Date(),
+      images: values.imageAttachments,
     };
     onConfirm({
       product: prod,
       unitType: values.unitType,
+      dimensions: values.dimensions,
+      imageAttachments: values.imageAttachments,
       remark: values.remark,
       quantity: values.quantity,
       lineItemId: Date.now().toString(),
@@ -93,7 +123,13 @@ export const CustomProductForm = ({
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
     >
-      {({ values, setFieldValue, errors, touched, isValid }) => (
+      {({
+        values,
+        setFieldValue,
+        errors,
+        touched,
+        isValid,
+      }) => (
         <Form className="" noValidate>
           <div className="grid gap-4 py-2">
             <div className="space-y-2">
@@ -104,9 +140,10 @@ export const CustomProductForm = ({
                 name="productName"
                 placeholder="Enter product name"
                 className={
-                  errors.productName && touched.productName
-                    ? "border-destructive"
-                    : ""
+                  FIELD_BORDER_CLASS +
+                  (errors.productName && touched.productName
+                    ? " border-destructive"
+                    : "")
                 }
               />
               <ErrorMessage
@@ -126,9 +163,9 @@ export const CustomProductForm = ({
                 placeholder="Enter product description"
                 rows={3}
                 className={
-                  "resize-none" +
+                  `resize-none ${FIELD_BORDER_CLASS}` +
                   (errors.description && touched.description
-                    ? "border-destructive"
+                    ? " border-destructive"
                     : "")
                 }
               />
@@ -165,28 +202,27 @@ export const CustomProductForm = ({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="quantity">Quantity*</Label>
-              <div className="w-30">
-                <Field
-                  as={Input}
-                  id="quantity"
-                  name="quantity"
-                  type="number"
-                  placeholder="Enter quantity"
-                  className={
-                    "" +
-                    (errors.quantity && touched.quantity
-                      ? "border-destructive"
-                      : "")
-                  }
-                />
-              </div>
+              <Label htmlFor="dimensions">Dimensions (optional)</Label>
+              <Field
+                as={Input}
+                id="dimensions"
+                name="dimensions"
+                placeholder="e.g., 10 x 8 mm, 18 inch, size 7"
+                className={
+                  FIELD_BORDER_CLASS +
+                  (errors.dimensions && touched.dimensions
+                    ? " border-destructive"
+                    : "")
+                }
+              />
               <ErrorMessage
-                name="quantity"
+                name="dimensions"
                 component="p"
-                className="text-sm text-destructive w-25"
+                className="text-sm text-destructive"
               />
             </div>
+          
+            
             <div className="space-y-2">
               <Label htmlFor="remark">Remark (optional)</Label>
               <Field
@@ -196,14 +232,57 @@ export const CustomProductForm = ({
                 placeholder="Enter remark"
                 rows={3}
                 className={
-                  "resize-none" +
-                  (errors.remark && touched.remark ? "border-destructive" : "")
+                  `resize-none ${FIELD_BORDER_CLASS}` +
+                  (errors.remark && touched.remark
+                    ? " border-destructive"
+                    : "")
                 }
               />
               <ErrorMessage
                 name="remark"
                 component="p"
                 className="text-sm text-destructive"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="quantity">Quantity*{values?.unitType?` (${values.unitType})`: ""}</Label>
+              <div className="flex gap-2 items-center flex-row">
+              <div className="w-30">
+                <Field
+                  as={Input}
+                  id="quantity"
+                  name="quantity"
+                  type="number"
+                  placeholder="Enter quantity"
+                  className={
+                    FIELD_BORDER_CLASS +
+                    (errors.quantity && touched.quantity
+                      ? " border-destructive"
+                      : "")
+                  }
+                />
+              </div>
+              <ErrorMessage
+                name="quantity"
+                component="p"
+                className="text-sm text-destructive"
+              />
+              </div>
+            </div>
+              <div className="space-y-2">
+              <ImageUpload
+                title="Image Attachments (optional)"
+                maxFileSize={10}
+                maxImages={20}
+                initialImages={values.imageAttachments.map(
+                  mapAssetToUploadedImage,
+                )}
+                onImagesChange={(images) => {
+                  setFieldValue(
+                    "imageAttachments",
+                    images.map(mapUploadedImageToAsset),
+                  );
+                }}
               />
             </div>
           </div>

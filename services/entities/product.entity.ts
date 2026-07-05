@@ -93,6 +93,7 @@ export class ProductEntity extends BaseEntity {
 
     reorderLevel?: number;
 
+    stockStatus?: string;
 
     storeLocations?: string[];
 

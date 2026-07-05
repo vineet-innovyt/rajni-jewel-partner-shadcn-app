@@ -1,4 +1,6 @@
 
+import { AssetItemEntity } from "../entities/asset-item.entity";
+
 export class OrderCreateDto {
     partnerId!: string;
     lineItems!: OrderLineItemDto[]
@@ -16,5 +18,7 @@ export class OrderLineItemDto {
     customProductType?: string;
     remark?: string;
     unitType?: string;
+    dimensions?: string;
+    imageAttachments?: AssetItemEntity[];
     quantity!: number;
 }

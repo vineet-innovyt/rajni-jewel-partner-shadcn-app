@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,8 @@ import { QUERY_KEYS } from "@/lib/constants";
 import { useQuery } from "@tanstack/react-query";
 import { productSearchApi } from "@/services/rajni-apis";
 
+const PRODUCT_PAGE_SIZE = 10;
+
 export function ProductsContent() {
   const { user } = useAuth();
   const { addToCart } = useCart();
@@ -19,14 +21,18 @@ export function ProductsContent() {
 
   const searchParams = useSearchParams();
   const qsCategory = searchParams.get("category")?.trim().toLowerCase();
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   const [filters, setFilters] = useState<FilterState>({
     categoryIds: [],
     subcategory: "",
     typeIds: [],
+    collectionIds: [],
     searchQuery: "",
     priceRange: [0, 20000],
   });
+  const [visibleProductCount, setVisibleProductCount] =
+    useState(PRODUCT_PAGE_SIZE);
 
   const {
     data: searchResult,
@@ -76,6 +82,13 @@ export function ProductsContent() {
         !filters.typeIds.includes(product.type?.code as string)
       )
         return false;
+      const productCollectionIds =
+        product.collections?.map((o) => o.code as string) || [];
+      if (
+        filters.collectionIds?.length &&
+        !filters.collectionIds.some((o) => productCollectionIds.includes(o))
+      )
+        return false;
       if (filters.searchQuery?.trim().length) {
         const query = filters.searchQuery.toLowerCase();
         if (
@@ -95,6 +108,41 @@ export function ProductsContent() {
       return true;
     });
   }, [products, filters]);
+
+  const visibleProducts = useMemo(
+    () => filteredProducts.slice(0, visibleProductCount),
+    [filteredProducts, visibleProductCount],
+  );
+
+  const hasMoreProducts = visibleProductCount < filteredProducts.length;
+
+  useEffect(() => {
+    setVisibleProductCount(PRODUCT_PAGE_SIZE);
+  }, [filters, products]);
+
+  useEffect(() => {
+    const target = loadMoreRef.current;
+    if (!target || !hasMoreProducts) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisibleProductCount((count) =>
+            Math.min(count + PRODUCT_PAGE_SIZE, filteredProducts.length),
+          );
+        }
+      },
+      {
+        rootMargin: "300px",
+      },
+    );
+
+    observer.observe(target);
+
+    return () => observer.disconnect();
+  }, [filteredProducts.length, hasMoreProducts]);
 
   if (isLoading) {
     return (
@@ -147,6 +195,7 @@ export function ProductsContent() {
                       categoryIds: [],
                       subcategory: "",
                       typeIds: [],
+                      collectionIds: [],
                       searchQuery: "",
                       priceRange: [0, 20000],
                     })
@@ -160,12 +209,13 @@ export function ProductsContent() {
               <>
                 <div className="mb-6">
                   <p className="text-sm text-muted-foreground">
-                    Showing {filteredProducts.length} product
+                    Showing {filteredProducts.length} of{" "}
+                    {filteredProducts.length} product
                     {filteredProducts.length !== 1 ? "s" : ""}
                   </p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {filteredProducts.map((product) => (
+                  {visibleProducts.map((product) => (
                     <ProductCard
                       key={product.id}
                       product={product}
@@ -173,6 +223,14 @@ export function ProductsContent() {
                     />
                   ))}
                 </div>
+                {hasMoreProducts && (
+                  <div
+                    ref={loadMoreRef}
+                    className="py-8 text-center text-sm text-muted-foreground"
+                  >
+                    Loading more products...
+                  </div>
+                )}
               </>
             )}
           </div>

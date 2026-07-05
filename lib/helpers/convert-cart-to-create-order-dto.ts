@@ -12,6 +12,7 @@ export function convertCartToCreateOrderDto(partnerId: string, items: OrderLineI
             item.customProductName = product?.name;
             item.customProductDescription = product?.description;
             item.customProductType = product?.type?.code;
+            item.imageAttachments = item.imageAttachments || product?.images;
         }
     })
     return dto;

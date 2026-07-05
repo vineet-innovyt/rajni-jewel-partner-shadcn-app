@@ -134,7 +134,7 @@ export const AddCustomProductModal = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
-        className="sm:max-w-md"
+        className="slim-scroll max-h-[90vh] overflow-y-auto sm:max-w-md"
         onInteractOutside={(e) => {
           e.preventDefault();
         }}

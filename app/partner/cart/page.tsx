@@ -33,6 +33,7 @@ import { createOrderApi } from "@/services/rajni-apis";
 import { convertCartToCreateOrderDto } from "@/lib/helpers";
 import { toast } from "sonner";
 import Footer from "@/components/footer";
+import { cdnService } from "@/services/cdn-service";
 
 export default function CartPage() {
   const { user, isLoading } = useAuth();
@@ -75,9 +76,26 @@ export default function CartPage() {
     try {
       setIsOrderPlacing(true);
       const dto = convertCartToCreateOrderDto(user.partnerId, items);
+
+      for (const item of dto.lineItems.filter(o=>o.isCustomProduct  && o.imageAttachments?.length)) {
+        if(item.imageAttachments)
+        {
+            const uploads = await cdnService.uploadObjectUrls(
+              "images",
+              item.imageAttachments .map((o) => o.url as string),
+              "product-images",
+            );
+            if (uploads?.length) {
+              uploads.map((o,i) =>{
+                item.imageAttachments![i].url = o.url;
+              });
+            }
+      }
+    }
+
       const orderEntity = await createOrderApi(dto);
       setCurrentOrder(orderEntity);
-      toast.success(`Order palced successfully`);
+      toast.success(`Order placed successfully`);
       router.push(PARTNER_ORDER_SUCCESS_PAGE);
       clearCart();
     } catch (ex) {
@@ -148,9 +166,25 @@ export default function CartPage() {
                     )}
                     {isCustom && (
                       <div className="flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden bg-secondary flex items-center justify-center">
-                        <span className="text-xs text-muted-foreground text-center px-2">
-                          No image
-                        </span>
+                        {item.imageAttachments?.[0]?.url ||
+                        item.product.images?.[0]?.url ? (
+                          <Image
+                            src={
+                              item.imageAttachments?.[0]?.url ||
+                              item.product.images?.[0]?.url ||
+                              "/placeholder.svg"
+                            }
+                            alt={item.product.name as string}
+                            width={96}
+                            height={96}
+                            className="h-full w-full object-cover"
+                            unoptimized
+                          />
+                        ) : (
+                          <span className="text-xs text-muted-foreground text-center px-2">
+                            No image
+                          </span>
+                        )}
                       </div>
                     )}
 
@@ -174,6 +208,11 @@ export default function CartPage() {
                             <p className="text-sm text-muted-foreground mt-1">
                               {`${item.quantity} ${item.unitType}`}
                             </p>
+                            {item.dimensions && (
+                              <p className="text-sm text-muted-foreground mt-1">
+                                {item.dimensions}
+                              </p>
+                            )}
                             <button
                               onClick={() => seteEditProductId(item.product.id)}
                               className="text-primary cursor-pointer hover:text-primary/80 transition text-sm flex items-center gap-1  mt-1"
