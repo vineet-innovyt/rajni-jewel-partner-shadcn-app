@@ -11,6 +11,7 @@ export interface FilterState {
   categoryIds: string[];
   subcategory: string;
   typeIds: string[];
+  collectionIds: string[];
   searchQuery: string;
   priceRange: [number, number];
 }
@@ -30,6 +31,7 @@ export function ProductFilters({
     category: true,
     price: true,
     type: true,
+    collection: true,
   });
 
   const types = sortBy(
@@ -76,6 +78,20 @@ export function ProductFilters({
     });
   };
 
+  const handleCollectionChange = (collectionId: string) => {
+    let collectionIds = [...filters.collectionIds];
+    if (filters.collectionIds.includes(collectionId)) {
+      collectionIds = collectionIds.filter((c) => c !== collectionId);
+    } else {
+      collectionIds.push(collectionId);
+    }
+
+    onFilterChange({
+      ...filters,
+      collectionIds,
+    });
+  };
+
   const toggleSection = (section: keyof typeof expandedSections) => {
     setExpandedSections((prev) => ({
       ...prev,
@@ -86,6 +102,14 @@ export function ProductFilters({
   const categories = sortBy(
     uniqBy(
       flatMap(products.map((o) => o.categories || [])),
+      (o) => o.code || "",
+    ),
+    (o) => o.value as string,
+  );
+
+  const collections = sortBy(
+    uniqBy(
+      flatMap(products.map((o) => o.collections || [])),
       (o) => o.code || "",
     ),
     (o) => o.value as string,
@@ -211,6 +235,46 @@ export function ProductFilters({
             </div>
           )}
         </div>
+
+        {/* Collection Filter */}
+        <div className="border-t border-border pt-4">
+          <button
+            onClick={() => toggleSection("collection")}
+            className="flex justify-between items-center w-full text-sm font-semibold text-foreground hover:text-primary transition mb-3"
+          >
+            Collection
+            <ChevronDown
+              size={16}
+              className={`transition ${
+                expandedSections.collection ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+          {expandedSections.collection && (
+            <div className="space-y-2 ">
+              {collections.map((collection) => (
+                <label
+                  key={collection.code}
+                  className="flex items-center gap-2 cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    checked={filters.collectionIds.includes(
+                      collection.code as string,
+                    )}
+                    onChange={() =>
+                      handleCollectionChange(collection.code as string)
+                    }
+                    className="w-4 h-4"
+                  />
+                  <span className="text-sm text-muted-foreground capitalize">
+                    {collection.value}
+                  </span>
+                </label>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
       {/* Reset Filters */}
       <Button
@@ -220,6 +284,7 @@ export function ProductFilters({
             categoryIds: [],
             subcategory: "",
             typeIds: [],
+            collectionIds: [],
             searchQuery: "",
             priceRange: [0, 20000],
           })

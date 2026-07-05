@@ -1,3 +1,4 @@
+import { AssetItemEntity } from "./asset-item.entity";
 import { ProductEntity } from "./product.entity";
 
 export class OrderLineItemEntity {
@@ -7,6 +8,8 @@ export class OrderLineItemEntity {
     isCustomProduct!: boolean;
     remark?: string;
     unitType?: string;
+    dimensions?: string;
+    imageAttachments?: AssetItemEntity[];
     quantity!: number;
 
     product!: ProductEntity;

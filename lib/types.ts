@@ -56,3 +56,9 @@ export interface IProductMetadata {
   finalMakingCharges?: number,
   costPerGram?: number
 }
+
+export interface IUploadFileCloudResult {
+  blobName: string;
+  isUploaded?: boolean;
+  url: string;
+}

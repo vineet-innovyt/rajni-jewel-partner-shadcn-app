@@ -45,9 +45,11 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
             className="object-cover group-hover:scale-110 transition duration-500"
           />
 
-          <div className="absolute top-3 right-3 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
-            Best Seller
-          </div>
+          {product.stockStatus && (
+            <div className="absolute top-3 right-3 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
+              {product.stockStatus}
+            </div>
+          )}
         </div>
       </Link>
 
@@ -106,7 +108,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
                       product,
                       quantity: 1,
                       isCustomProduct: false,
-                    }
+                    },
                   )
                 }
                 size="sm"

@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { PARTNER_PRODUCTS_PAGE, QUERY_KEYS } from "@/lib/constants";
 import { getPartnerOrderSearchApi } from "@/services/rajni-apis";
 import { useQuery } from "@tanstack/react-query";
-import { OrderEntity } from "@/services/entities";
+import { OrderEntity, OrderLineItemEntity } from "@/services/entities";
 import { useReactToPrint } from "react-to-print";
 import { useRef } from "react";
 import { format } from "date-fns";
@@ -123,6 +123,13 @@ const OrderBlock = ({ order }: { order: OrderEntity }) => {
     reactToPrintFn();
   };
 
+  const getImageUrl = (item: OrderLineItemEntity) => {
+    if (item && item.isCustomProduct && item.imageAttachments?.length) {
+      return item.imageAttachments[0].url || "/placeholder.svg";
+    }
+    return item.product.images?.[0]?.url || "/placeholder.svg";
+  };
+
   return (
     <div
       ref={contentRef}
@@ -183,7 +190,7 @@ const OrderBlock = ({ order }: { order: OrderEntity }) => {
                 <div key={item.product.id} className="flex gap-4">
                   <div className="relative w-20 h-20 rounded bg-card border border-border flex-shrink-0">
                     <Image
-                      src={item.product.images?.[0]?.url || "/placeholder.svg"}
+                      src={getImageUrl(item)}
                       alt={item.product.name as string}
                       fill
                       className="object-cover rounded"
